@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONTABILIDADE MIRANDA</title>
+<title>CRM Contabilidade Miranda</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -787,10 +787,18 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
 }
 .cliente-type-selector .tipo-opcao{
-  border:1px solid var(--line-strong);border-radius:9px;padding:10px;text-align:center;
-  background:#fff;font-size:11.5px;font-weight:700;color:var(--muted);
+  border:1.5px solid var(--line-strong);border-radius:9px;padding:11px 8px;text-align:center;
+  background:#fff;font-size:12px;font-weight:700;color:var(--muted);
+  cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease;
+  line-height:1.3;
 }
-.cliente-type-selector .tipo-opcao.ativo{border-color:var(--primary);background:var(--primary-wash);color:var(--primary);}
+.cliente-type-selector .tipo-opcao:hover{border-color:var(--primary-light);color:var(--primary);}
+.cliente-type-selector .tipo-opcao.ativo{
+  border-color:var(--primary);background:var(--primary-wash);color:var(--primary);
+  box-shadow:inset 0 0 0 1px var(--primary);
+}
+.field-row-doc{align-items:flex-start;}
+.field-row-doc .field small{display:block;margin-top:5px;font-size:10.5px;color:var(--muted);font-weight:500;}
 .endereco-grid{
   display:grid;grid-template-columns:minmax(0,2fr) 100px minmax(120px,1fr) minmax(140px,1.2fr);
   gap:10px;
@@ -1395,24 +1403,36 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Identificação
         </div>
-        <div class="field-row">
-          <div class="field" style="flex:2;"><label>Nome / Razão social *</label><input type="text" id="f-cliente-nome" placeholder="Nome completo ou razão social"></div>
-          <div class="field" style="flex:1;"><label>Tipo de cadastro *</label>
-            <select id="f-cliente-tipo">
-              <option value="PF">Pessoa Física</option>
-              <option value="PJ">Pessoa Jurídica</option>
-              <option value="AUT">Autônomo</option>
-            </select>
+        <div class="field">
+          <label>Nome / Razão social *</label>
+          <input type="text" id="f-cliente-nome" placeholder="Nome completo ou razão social">
+        </div>
+
+        <div class="field">
+          <label>Tipo de cadastro *</label>
+          <div class="cliente-type-selector" id="cliente-type-selector">
+            <button type="button" class="tipo-opcao" data-tipo="PF" onclick="selecionarTipoCliente('PF')">Pessoa Física</button>
+            <button type="button" class="tipo-opcao" data-tipo="PJ" onclick="selecionarTipoCliente('PJ')">Pessoa Jurídica</button>
+            <button type="button" class="tipo-opcao" data-tipo="AUT" onclick="selecionarTipoCliente('AUT')">Autônomo</button>
           </div>
+          <input type="hidden" id="f-cliente-tipo" value="PF">
         </div>
 
         <div class="field-row" id="grupo-nome-empresa">
           <div class="field"><label>Nome fantasia</label><input type="text" id="f-cliente-nomeempresa" placeholder="Nome comercial"></div>
         </div>
 
-        <div class="field-row">
-          <div class="field" id="grupo-cpf"><label>CPF</label><input type="text" id="f-cliente-cpf" placeholder="000.000.000-00"></div>
-          <div class="field" id="grupo-cnpj"><label>CNPJ</label><input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00"></div>
+        <div class="field-row field-row-doc">
+          <div class="field" id="grupo-cpf">
+            <label id="label-cliente-cpf">CPF</label>
+            <input type="text" id="f-cliente-cpf" placeholder="000.000.000-00">
+            <small id="hint-cliente-cpf" style="display:none;">Do responsável legal pela empresa</small>
+          </div>
+          <div class="field" id="grupo-cnpj">
+            <label>CNPJ</label>
+            <input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00">
+            <small>Documento da empresa</small>
+          </div>
         </div>
       </div>
 
@@ -1721,7 +1741,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
    crie um projeto gratuito em supabase.com, rode o SQL de configuração
    e cole aqui a "Project URL" e a chave "anon public" (ou "Publishable key").
    ============================================================ */
-const SUPABASE_URL = 'https://pcbvquzpdwiwontuhkpr.supabase.co';
+const SUPABASE_URL = 'https://wswqgyyoafisycbxvpas.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_kkQcC98fymStZesapNhh7g_73zkDLWr';
 const SUPABASE_TABLE = 'sistema_dados';
 const SUPABASE_ROW_ID = 'principal';
@@ -2492,6 +2512,16 @@ let editingClientId = null;
 document.getElementById('btn-novo-cliente').addEventListener('click', ()=>openClienteModal());
 document.getElementById('qa-cliente').addEventListener('click', ()=>{ openClienteModal(); });
 
+function setTipoClienteUI(tipo){
+  document.getElementById('f-cliente-tipo').value = tipo;
+  document.querySelectorAll('#cliente-type-selector .tipo-opcao').forEach(btn=>{
+    btn.classList.toggle('ativo', btn.dataset.tipo === tipo);
+  });
+}
+function selecionarTipoCliente(tipo){
+  setTipoClienteUI(tipo);
+  toggleTipoEmpresa();
+}
 function toggleTipoEmpresa(){
   const tipo = document.getElementById('f-cliente-tipo').value;
   const isPJ = tipo==='PJ';
@@ -2499,9 +2529,13 @@ function toggleTipoEmpresa(){
   document.getElementById('grupo-pj-extra').style.display = isPJ ? 'block' : 'none';
   document.getElementById('grupo-nome-empresa').style.display = isPJ ? 'flex' : 'none';
 
-  // CPF aparece para PF e Autônomo; CNPJ e dados jurídicos ficam ocultos nos demais casos.
-  document.getElementById('grupo-cpf').style.display = (!isPJ) ? 'block' : 'none';
+  // O CPF agora fica sempre visível: para PF/Autônomo é o documento do
+  // próprio cliente; para PJ, é o CPF do responsável legal pela empresa.
+  document.getElementById('grupo-cpf').style.display = 'block';
   document.getElementById('grupo-cnpj').style.display = isPJ ? 'block' : 'none';
+  document.getElementById('label-cliente-cpf').textContent = isPJ ? 'CPF do responsável' : 'CPF';
+  document.getElementById('f-cliente-cpf').placeholder = isPJ ? '000.000.000-00' : '000.000.000-00';
+  document.getElementById('hint-cliente-cpf').style.display = isPJ ? 'block' : 'none';
 
   if(!isPJ){
     document.getElementById('f-cliente-cnpj').value = '';
@@ -2510,7 +2544,7 @@ function toggleTipoEmpresa(){
     document.getElementById('f-cliente-abertura').value = '';
   }
 }
-document.getElementById('f-cliente-tipo').addEventListener('change', toggleTipoEmpresa);
+document.getElementById('f-cliente-tipo').addEventListener('change', toggleTipoEmpresa); // mantido por segurança (não é mais alterado via UI)
 
 function toggleTipoCliente(){
   const tipoCliente = document.getElementById('f-cliente-tipocliente').value;
@@ -2526,7 +2560,7 @@ function openClienteModal(client){
     : `Código do cliente: será gerado automaticamente ao salvar`;
   document.getElementById('f-cliente-nome').value = client ? client.nome : '';
   document.getElementById('f-cliente-nomeempresa').value = client ? (client.nomeEmpresa||'') : '';
-  document.getElementById('f-cliente-tipo').value = client ? (client.tipoEmpresa || 'PF') : 'PF';
+  setTipoClienteUI(client ? (client.tipoEmpresa || 'PF') : 'PF');
   document.getElementById('f-cliente-cpf').value = client ? (client.cpf||'') : '';
   document.getElementById('f-cliente-cnpj').value = client ? (client.cnpj||'') : '';
   document.getElementById('f-cliente-tel').value = client ? (client.contato || client.telefone || '') : '';
