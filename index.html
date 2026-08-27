@@ -617,7 +617,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 /* ---------- modal ---------- */
 .overlay{
   position:fixed;inset:0;background:rgba(35,38,31,0.45);display:none;
-  align-items:flex-start;justify-content:center;padding:5vh 16px;z-index:50;overflow-y:auto;
+  align-items:flex-start;justify-content:center;padding:6vh 24px;z-index:50;overflow-y:auto;
 }
 .overlay.active{display:flex;}
 .modal{
@@ -750,7 +750,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 .cliente-modal-head{
   flex:0 0 auto;display:flex;align-items:center;gap:14px;
-  padding:20px 26px 18px;
+  padding:26px 36px 22px;
   background:linear-gradient(135deg,#173424 0%,#28523A 60%,#1F3D2B 100%);
   color:#fff;
 }
@@ -760,9 +760,9 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 .cliente-modal-head h3{color:#fff!important;margin:0!important;font-size:22px!important;}
 .cliente-modal-head .modal-sub{color:rgba(255,255,255,.72);margin:4px 0 0;}
-.cliente-form-body{flex:1 1 auto;overflow-y:auto;padding:22px 26px 6px;}
+.cliente-form-body{flex:1 1 auto;overflow-y:auto;padding:28px 36px 10px;}
 .cliente-form-section{
-  margin:0 0 18px;padding:16px 16px 15px;border:1px solid var(--line);border-radius:12px;background:#FCFCFA;
+  margin:0 0 22px;padding:20px 22px 19px;border:1px solid var(--line);border-radius:12px;background:#FCFCFA;
   transition:border-color .15s ease;
 }
 .cliente-form-section:focus-within{border-color:var(--line-strong);}
@@ -781,21 +781,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   border-radius:9px;padding:12px 14px;font-size:15px;background:#fff;
 }
 .cliente-modal-modern .modal-actions{
-  flex:0 0 auto;margin:0;padding:15px 26px 20px;border-top:1px solid var(--line);background:#FBFAF6;
-}
-.cliente-type-selector{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-}
-.cliente-type-selector .tipo-opcao{
-  border:1.5px solid var(--line-strong);border-radius:9px;padding:11px 8px;text-align:center;
-  background:#fff;font-size:12px;font-weight:700;color:var(--muted);
-  cursor:pointer;transition:border-color .15s ease,background .15s ease,color .15s ease,box-shadow .15s ease;
-  line-height:1.3;
-}
-.cliente-type-selector .tipo-opcao:hover{border-color:var(--primary-light);color:var(--primary);}
-.cliente-type-selector .tipo-opcao.ativo{
-  border-color:var(--primary);background:var(--primary-wash);color:var(--primary);
-  box-shadow:inset 0 0 0 1px var(--primary);
+  flex:0 0 auto;margin:0;padding:18px 36px 26px;border-top:1px solid var(--line);background:#FBFAF6;
 }
 .field-row-doc{align-items:flex-start;}
 .field-row-doc .field small{display:block;margin-top:5px;font-size:10.5px;color:var(--muted);font-weight:500;}
@@ -810,7 +796,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 @media (max-width:600px){
   .clientes-summary{grid-template-columns:1fr;}
-  .cliente-type-selector{grid-template-columns:1fr;}
   .endereco-grid{grid-template-columns:1fr;}
 }
 
@@ -1403,19 +1388,19 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Identificação
         </div>
-        <div class="field">
-          <label>Nome / Razão social *</label>
-          <input type="text" id="f-cliente-nome" placeholder="Nome completo ou razão social">
-        </div>
-
-        <div class="field">
-          <label>Tipo de cadastro *</label>
-          <div class="cliente-type-selector" id="cliente-type-selector">
-            <button type="button" class="tipo-opcao" data-tipo="PF" onclick="selecionarTipoCliente('PF')">Pessoa Física</button>
-            <button type="button" class="tipo-opcao" data-tipo="PJ" onclick="selecionarTipoCliente('PJ')">Pessoa Jurídica</button>
-            <button type="button" class="tipo-opcao" data-tipo="AUT" onclick="selecionarTipoCliente('AUT')">Autônomo</button>
+        <div class="field-row">
+          <div class="field" style="flex:2;">
+            <label>Nome / Razão social *</label>
+            <input type="text" id="f-cliente-nome" placeholder="Nome completo ou razão social">
           </div>
-          <input type="hidden" id="f-cliente-tipo" value="PF">
+          <div class="field" style="flex:1;">
+            <label>Tipo de cadastro *</label>
+            <select id="f-cliente-tipo">
+              <option value="PF">Pessoa Física</option>
+              <option value="PJ">Pessoa Jurídica</option>
+              <option value="AUT">Autônomo</option>
+            </select>
+          </div>
         </div>
 
         <div class="field-row" id="grupo-nome-empresa">
@@ -1975,18 +1960,29 @@ function competenciaLabel(comp){
   return `${MESES_PT[parseInt(mes,10)-1]}/${ano}`;
 }
 
-/* Gera (uma vez cada) as cobranças de honorário mensal do cliente, do mês de
-   admissão (ou janeiro, se admitido em ano anterior) até o mês atual — nunca
-   gera cobranças de anos anteriores nem de meses futuros. Usa a data de
-   ADMISSÃO (início do contrato com o escritório), não a data de abertura da
-   empresa — um cliente pode ter sido fundado anos atrás e só ter contratado
-   os serviços agora. */
+/* Gera (uma vez cada) as cobranças de honorário mensal do cliente, em
+   REGIME DE COMPETÊNCIA VENCIDA: só lança a cobrança de um mês depois que
+   esse mês termina — ou seja, a partir do dia 01 do mês seguinte — com
+   vencimento no dia 10 desse mesmo mês seguinte. Exemplo: o honorário
+   referente a agosto/2026 só é lançado a partir de 01/09/2026, com
+   vencimento em 10/09/2026. O mês corrente NUNCA é cobrado antecipadamente.
+   Cobre do mês de admissão (ou janeiro, se admitido em ano anterior) até o
+   último mês já encerrado. Usa a data de ADMISSÃO (início do contrato com
+   o escritório), não a data de abertura da empresa — um cliente pode ter
+   sido fundado anos atrás e só ter contratado os serviços agora. */
+function competenciaSeguinte(competencia){
+  let [ano, mes] = competencia.split('-').map(Number);
+  mes += 1;
+  if(mes > 12){ mes = 1; ano += 1; }
+  return `${ano}-${String(mes).padStart(2,'0')}`;
+}
 function gerarHonorariosMensaisCliente(d, client){
   if(!client || !(Number(client.honorario||0) > 0)) return;
   if((client.tipoCliente || 'Mensal') !== 'Mensal') return; // clientes Avulso não geram cobrança recorrente
   const hoje = new Date();
   const anoAtual = hoje.getFullYear();
   const mesAtual = hoje.getMonth(); // 0-indexado
+  const ultimoMesEncerrado = mesAtual - 1; // mês corrente nunca é cobrado antecipadamente
 
   let mesInicio = 0; // janeiro, por padrão
   if(client.dataAdmissao){
@@ -2001,7 +1997,7 @@ function gerarHonorariosMensaisCliente(d, client){
     }
   }
 
-  for(let m = mesInicio; m <= mesAtual; m++){
+  for(let m = mesInicio; m <= ultimoMesEncerrado; m++){
     const competencia = `${anoAtual}-${String(m+1).padStart(2,'0')}`;
     const jaExiste = d.charges.some(ch => ch.clientId===client.id && ch.origem==='honorario_mensal' && ch.competencia===competencia);
     if(!jaExiste){
@@ -2013,7 +2009,7 @@ function gerarHonorariosMensaisCliente(d, client){
         competencia,
         descricao: `Honorário mensal — ${competenciaLabel(competencia)}`,
         valorTotal: Number(client.honorario),
-        vencimento: `${competencia}-10`,
+        vencimento: `${competenciaSeguinte(competencia)}-10`,
         createdAt: new Date().toISOString(),
       });
     }
@@ -2479,7 +2475,7 @@ function renderClientes(){
     const contato = c.contato || c.telefone || 'Sem contato';
 
     return `<tr>
-      <td><span class="codigo-chip">#${String(c.codigo).padStart(4,'0')}</span></td>
+      <td><span class="codigo-chip">${String(c.codigo).padStart(4,'0')}</span></td>
       <td class="cliente-name-cell">
         <strong>${escapeHtml(c.nome)}</strong>
         ${c.nomeEmpresa ? `<span class="cliente-sub">${escapeHtml(c.nomeEmpresa)}</span>` : `<span class="cliente-sub">${escapeHtml(doc)}</span>`}
@@ -2512,16 +2508,6 @@ let editingClientId = null;
 document.getElementById('btn-novo-cliente').addEventListener('click', ()=>openClienteModal());
 document.getElementById('qa-cliente').addEventListener('click', ()=>{ openClienteModal(); });
 
-function setTipoClienteUI(tipo){
-  document.getElementById('f-cliente-tipo').value = tipo;
-  document.querySelectorAll('#cliente-type-selector .tipo-opcao').forEach(btn=>{
-    btn.classList.toggle('ativo', btn.dataset.tipo === tipo);
-  });
-}
-function selecionarTipoCliente(tipo){
-  setTipoClienteUI(tipo);
-  toggleTipoEmpresa();
-}
 function toggleTipoEmpresa(){
   const tipo = document.getElementById('f-cliente-tipo').value;
   const isPJ = tipo==='PJ';
@@ -2529,12 +2515,11 @@ function toggleTipoEmpresa(){
   document.getElementById('grupo-pj-extra').style.display = isPJ ? 'block' : 'none';
   document.getElementById('grupo-nome-empresa').style.display = isPJ ? 'flex' : 'none';
 
-  // O CPF agora fica sempre visível: para PF/Autônomo é o documento do
-  // próprio cliente; para PJ, é o CPF do responsável legal pela empresa.
+  // O CPF fica sempre visível: para PF/Autônomo é o documento do próprio
+  // cliente; para PJ, aparece junto com o CNPJ como CPF do responsável legal.
   document.getElementById('grupo-cpf').style.display = 'block';
   document.getElementById('grupo-cnpj').style.display = isPJ ? 'block' : 'none';
   document.getElementById('label-cliente-cpf').textContent = isPJ ? 'CPF do responsável' : 'CPF';
-  document.getElementById('f-cliente-cpf').placeholder = isPJ ? '000.000.000-00' : '000.000.000-00';
   document.getElementById('hint-cliente-cpf').style.display = isPJ ? 'block' : 'none';
 
   if(!isPJ){
@@ -2544,7 +2529,7 @@ function toggleTipoEmpresa(){
     document.getElementById('f-cliente-abertura').value = '';
   }
 }
-document.getElementById('f-cliente-tipo').addEventListener('change', toggleTipoEmpresa); // mantido por segurança (não é mais alterado via UI)
+document.getElementById('f-cliente-tipo').addEventListener('change', toggleTipoEmpresa);
 
 function toggleTipoCliente(){
   const tipoCliente = document.getElementById('f-cliente-tipocliente').value;
@@ -2556,11 +2541,11 @@ function openClienteModal(client){
   editingClientId = client ? client.id : null;
   document.getElementById('cliente-modal-title').textContent = client ? 'Editar cliente' : 'Novo cliente';
   document.getElementById('cliente-modal-codigo').textContent = client
-    ? `Código do cliente: #${String(client.codigo).padStart(4,'0')}`
+    ? `Código do cliente: ${String(client.codigo).padStart(4,'0')}`
     : `Código do cliente: será gerado automaticamente ao salvar`;
   document.getElementById('f-cliente-nome').value = client ? client.nome : '';
   document.getElementById('f-cliente-nomeempresa').value = client ? (client.nomeEmpresa||'') : '';
-  setTipoClienteUI(client ? (client.tipoEmpresa || 'PF') : 'PF');
+  document.getElementById('f-cliente-tipo').value = client ? (client.tipoEmpresa || 'PF') : 'PF';
   document.getElementById('f-cliente-cpf').value = client ? (client.cpf||'') : '';
   document.getElementById('f-cliente-cnpj').value = client ? (client.cnpj||'') : '';
   document.getElementById('f-cliente-tel').value = client ? (client.contato || client.telefone || '') : '';
@@ -3374,7 +3359,7 @@ function abrirFicha(clientId){
         </div>
         <div class="ficha-date">Emitido em ${new Date().toLocaleDateString('pt-BR')}</div>
       </div>
-      <h2 class="ficha-client-name" style="margin-bottom:2px;">#${String(c.codigo).padStart(4,'0')} — ${escapeHtml(c.nome)}</h2>
+      <h2 class="ficha-client-name" style="margin-bottom:2px;">${String(c.codigo).padStart(4,'0')} — ${escapeHtml(c.nome)}</h2>
       ${c.nomeEmpresa ? `<div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Nome da Empresa: <strong style="color:var(--ink);">${escapeHtml(c.nomeEmpresa)}</strong></div>` : '<div style="margin-bottom:10px;"></div>'}
       <div class="ficha-grid">
         <div><span>Tipo</span>${c.tipoEmpresa==='PJ'?'Pessoa Jurídica':'Pessoa Física'}</div>
