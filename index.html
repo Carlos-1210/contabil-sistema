@@ -655,15 +655,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .ficha-sheet table{margin-bottom:4px;}
 .ficha-sheet thead th{background:none;padding:6px 4px;font-size:10.5px;}
 .ficha-sheet tbody td{padding:7px 4px;font-size:12.5px;}
-.saldo-box{
-  margin-top:22px;padding:14px 18px;background:var(--primary-wash);border-radius:var(--radius);
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-}
-.saldo-box .totais-mini{display:flex;gap:18px;font-size:11.5px;color:var(--muted);}
-.saldo-box .totais-mini strong{display:block;font-family:var(--font-mono);font-size:13px;color:var(--ink);}
-.saldo-label{font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--primary);font-weight:600;}
-.saldo-value{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--primary);}
-.saldo-value.owed{color:var(--danger);}
 
 /* ---------- toast ---------- */
 .toast{
@@ -786,13 +777,12 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .field-row-doc{align-items:flex-start;}
 .field-row-doc .field small{display:block;margin-top:5px;font-size:10.5px;color:var(--muted);font-weight:500;}
 .endereco-grid{
-  display:grid;grid-template-columns:minmax(0,2fr) 100px minmax(120px,1fr) minmax(140px,1.2fr);
+  display:grid;grid-template-columns:90px minmax(140px,1fr) minmax(160px,1.3fr);
   gap:10px;
 }
 @media (max-width:900px){
   .clientes-summary{grid-template-columns:repeat(2,1fr);}
   .clientes-search-modern{grid-template-columns:1fr;}
-  .endereco-grid{grid-template-columns:1fr 100px;}
 }
 @media (max-width:600px){
   .clientes-summary{grid-template-columns:1fr;}
@@ -1427,9 +1417,12 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           Contato
         </div>
         <div class="field-row">
-          <div class="field"><label>Contato</label><input type="text" id="f-cliente-tel" placeholder="(00) 00000-0000"></div>
-          <div class="field"><label>Contato alternativo</label><input type="text" id="f-cliente-contato-alt" placeholder="Telefone ou WhatsApp alternativo"></div>
-          <div class="field"><label>E-mail</label><input type="email" id="f-cliente-email" placeholder="cliente@email.com"></div>
+          <div class="field"><label>Telefone</label><input type="text" id="f-cliente-tel" placeholder="(00) 00000-0000"></div>
+          <div class="field"><label>Telefone alternativo</label><input type="text" id="f-cliente-contato-alt" placeholder="WhatsApp ou telefone alternativo"></div>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="f-cliente-email" placeholder="cliente@email.com">
         </div>
       </div>
 
@@ -1438,8 +1431,11 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Endereço
         </div>
+        <div class="field">
+          <label>Logradouro</label>
+          <input type="text" id="f-cliente-logradouro" placeholder="Rua, Avenida, Praça...">
+        </div>
         <div class="endereco-grid">
-          <div class="field"><label>Logradouro</label><input type="text" id="f-cliente-logradouro" placeholder="Rua, Avenida, Praça..."></div>
           <div class="field"><label>Nº</label><input type="text" id="f-cliente-numero" placeholder="Nº"></div>
           <div class="field"><label>Bairro</label><input type="text" id="f-cliente-bairro"></div>
           <div class="field"><label>Cidade</label><input type="text" id="f-cliente-cidade"></div>
@@ -1497,8 +1493,8 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           Acessos e observações
         </div>
         <div class="field-row">
-          <div class="field"><label>Código de acesso (gov.br)</label><input type="text" id="f-cliente-codacesso"></div>
-          <div class="field"><label>Senha GOV</label><input type="text" id="f-cliente-senhagov"></div>
+          <div class="field"><label>Código de acesso</label><input type="text" id="f-cliente-codacesso"></div>
+          <div class="field"><label>Senha ECAC</label><input type="text" id="f-cliente-senhagov"></div>
         </div>
         <div class="field"><label>Observações</label><textarea id="f-cliente-obs" placeholder="Informações adicionais sobre o cliente..."></textarea></div>
       </div>
@@ -3329,27 +3325,13 @@ document.getElementById('salvar-pagamento').addEventListener('click', ()=>{
 });
 
 /* ================= FICHA DO CLIENTE ================= */
+/* A ficha mostra apenas os dados de CADASTRO do cliente (identificação,
+   documentos, contato, endereço, acessos e observações) — não exibe
+   cobranças, pagamentos, coletas, serviços nem saldo devedor. Para ver a
+   situação financeira do cliente, use a lista de Cobranças. */
 function abrirFicha(clientId){
   const c = DATA.clients.find(c=>c.id===clientId);
   if(!c) return;
-  const coletas = DATA.collections.filter(x=>x.clientId===clientId).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  const servicos = DATA.services.filter(x=>x.clientId===clientId).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  const pagamentos = DATA.payments.filter(x=>x.clientId===clientId).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  const cobrancas = DATA.charges.filter(x=>x.clientId===clientId).sort((a,b)=>(b.vencimento||'').localeCompare(a.vencimento||''));
-  const saldo = clientBalance(clientId);
-
-  const coletasRows = coletas.length ? coletas.map(x=>`<tr><td>${fmtDate(x.data)}</td><td>${escapeHtml(x.descricao||'—')}</td><td>${x.status}</td></tr>`).join('')
-    : `<tr><td colspan="3" style="color:var(--muted);">Nenhuma coleta registrada.</td></tr>`;
-  const servicosRows = servicos.length ? servicos.map(x=>`<tr><td>${fmtDate(x.data)}</td><td>${escapeHtml(x.descricao||'—')}</td><td class="num">${fmtMoney(x.valor)}</td><td>${x.status}</td></tr>`).join('')
-    : `<tr><td colspan="4" style="color:var(--muted);">Nenhum serviço registrado.</td></tr>`;
-  const cobrancasRows = cobrancas.length ? cobrancas.map(ch=>{
-    const st = chargeStatus(ch);
-    return `<tr><td>${fmtDate(ch.vencimento)}</td><td>${escapeHtml(ch.descricao||'—')}</td><td class="num">${fmtMoney(ch.valorTotal)}</td><td>${st}</td></tr>`;
-  }).join('') : `<tr><td colspan="4" style="color:var(--muted);">Nenhuma cobrança registrada.</td></tr>`;
-  const pagamentosRows = pagamentos.length ? pagamentos.map(x=>`<tr><td>${fmtDate(x.data)}</td><td>${x.forma}</td><td class="num">${fmtMoney(x.valor)}</td></tr>`).join('')
-    : `<tr><td colspan="3" style="color:var(--muted);">Nenhum pagamento registrado.</td></tr>`;
-  const totalCobrado = cobrancas.reduce((s,ch)=>s+Number(ch.valorTotal||0),0);
-  const totalPagoCliente = pagamentos.reduce((s,x)=>s+Number(x.valor||0),0);
 
   document.getElementById('print-area').innerHTML = `
     <div class="ficha-sheet">
@@ -3380,31 +3362,8 @@ function abrirFicha(clientId){
       <div class="ficha-section-title">Acesso aos portais</div>
       <div class="ficha-grid" style="margin-bottom:6px;">
         <div><span>Código de Acesso</span>${escapeHtml(c.codigoAcesso||'—')}</div>
-        <div><span>Senha GOV</span>${escapeHtml(c.senhaGov||'—')}</div>
+        <div><span>Senha ECAC</span>${escapeHtml(c.senhaGov||'—')}</div>
       </div>` : ''}
-
-      <div class="ficha-section-title">Coletas</div>
-      <table><thead><tr><th>Data</th><th>Descrição</th><th>Status</th></tr></thead><tbody>${coletasRows}</tbody></table>
-
-      <div class="ficha-section-title">Serviços</div>
-      <table><thead><tr><th>Data</th><th>Descrição</th><th style="text-align:right;">Valor</th><th>Status</th></tr></thead><tbody>${servicosRows}</tbody></table>
-
-      <div class="ficha-section-title">Cobranças (honorários e avulsas)</div>
-      <table><thead><tr><th>Vencimento</th><th>Descrição</th><th style="text-align:right;">Valor</th><th>Status</th></tr></thead><tbody>${cobrancasRows}</tbody></table>
-
-      <div class="ficha-section-title">Pagamentos</div>
-      <table><thead><tr><th>Data</th><th>Forma</th><th style="text-align:right;">Valor</th></tr></thead><tbody>${pagamentosRows}</tbody></table>
-
-      <div class="saldo-box">
-        <div class="totais-mini">
-          <div>Total cobrado<strong>${fmtMoney(totalCobrado)}</strong></div>
-          <div>Total pago<strong>${fmtMoney(totalPagoCliente)}</strong></div>
-        </div>
-        <div style="text-align:right;">
-          <span class="saldo-label">${saldo>0 ? 'Saldo devedor' : 'Situação'}</span><br>
-          <span class="saldo-value ${saldo>0?'owed':''}">${saldo>0 ? fmtMoney(saldo) : (saldo<0 ? 'Crédito de '+fmtMoney(Math.abs(saldo)) : 'Quitado')}</span>
-        </div>
-      </div>
     </div>
   `;
   fichaReturnView = 'clientes';
@@ -3531,7 +3490,7 @@ const CLIENTE_CSV_COLUNAS = [
   ['logradouro','Logradouro'], ['numero','Nº'], ['bairro','Bairro'], ['cidade','Cidade'], ['endereco','Endereço'],
   ['tipoCliente','Tipo de Cliente'], ['regimeTributario','Regime Tributário'], ['dataAbertura','Data de Abertura'],
   ['dataAdmissao','Data de Admissão'], ['honorario','Honorário Mensal'], ['status','Status'],
-  ['codigoAcesso','Código de Acesso'], ['senhaGov','Senha GOV'], ['obs','Observações'],
+  ['codigoAcesso','Código de Acesso'], ['senhaGov','Senha ECAC'], ['obs','Observações'],
 ];
 
 function exportarClientes(){
