@@ -1325,6 +1325,22 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         </div>
       </div>
 
+      <div class="card" style="padding:20px 22px;margin-bottom:22px;border-left:3px solid var(--accent);">
+        <div class="card-label" style="margin-bottom:6px;">⚡ Acesso rápido — sem nenhuma configuração</div>
+        <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px;">
+          Se você já estiver logado com sua conta Google no navegador (o mesmo login do Gmail, por exemplo),
+          pode abrir o Google Drive direto numa aba nova — grátis, sem precisar configurar nada abaixo.
+          Lá você já tem enviar, baixar e organizar arquivos com a própria interface do Google, e para trocar
+          de conta é só usar o seletor de contas no canto superior direito da página do Google.
+        </div>
+        <button class="btn" id="btn-drive-abrir-simples" type="button">↗ Abrir o Google Drive numa aba nova</button>
+      </div>
+
+      <div style="border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px;">
+        <h2 style="font-family:var(--font-display);font-size:16px;font-weight:600;margin:0;color:var(--ink);">Acesso integrado (avançado)</h2>
+        <div class="view-desc" style="margin-top:2px;">Opcional — exige configurar uma credencial gratuita do Google (veja em Sistema). Deixa os arquivos embutidos aqui dentro do sistema, sem abrir aba nova.</div>
+      </div>
+
       <div class="drive-accounts" id="drive-accounts"></div>
 
       <div id="drive-config-warning"></div>
@@ -4310,8 +4326,8 @@ function renderDriveView(){
     empty.innerHTML = `
       <div class="drive-empty">
         <div class="drive-empty-icon">🔌</div>
-        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">O Drive ainda não foi configurado</div>
-        <div style="max-width:520px;margin:0 auto;">Para conectar contas do Google Drive é preciso criar um "OAuth Client ID" gratuito no Google Cloud Console e colar o valor na constante <code>GOOGLE_CLIENT_ID</code>, no topo do arquivo. Peça ao Claude o passo a passo, se precisar.</div>
+        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">O acesso integrado ainda não foi configurado</div>
+        <div style="max-width:520px;margin:0 auto;">Use o botão "Abrir o Google Drive numa aba nova", ali em cima, para acessar seus arquivos agora mesmo, sem nenhuma configuração. Se preferir deixar os arquivos embutidos aqui dentro do sistema, é preciso criar um "OAuth Client ID" gratuito no Google Cloud Console e colar o valor na constante <code>GOOGLE_CLIENT_ID</code>, no topo do arquivo (veja o passo a passo na tela Sistema).</div>
       </div>`;
     return;
   }
@@ -4347,6 +4363,9 @@ document.getElementById('btn-drive-upload').addEventListener('click', ()=>{
 document.getElementById('drive-upload-input').addEventListener('change', (e)=>{
   driveEnviarArquivos(e.target.files);
   e.target.value = '';
+});
+document.getElementById('btn-drive-abrir-simples').addEventListener('click', ()=>{
+  window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
 });
 
 async function initApp(){
