@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM Contabilidade Miranda</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -27,6 +26,60 @@
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
+[data-theme="dark"]{
+  --bg: #171A15;
+  --surface: #20241D;
+  --ink: #EDEBE2;
+  --muted: #9C9987;
+  --line: #363A2F;
+  --line-strong: #4A4E3F;
+  --primary: #6FA383;
+  --primary-light: #86BD9A;
+  --primary-wash: #263329;
+  --accent: #D4A055;
+  --accent-wash: #332A19;
+  --danger: #E08A78;
+  --danger-wash: #3A2420;
+}
+[data-theme="dark"] .btn:not(.btn-ghost):not(.btn-danger){color:#12160F;}
+[data-theme="dark"] .dashboard-kpi-primary,
+[data-theme="dark"] .dash-hero.professional-hero{background:linear-gradient(135deg,#1B2A20 0%,#233A2A 100%);}
+[data-theme="dark"] .codigo-chip,[data-theme="dark"] .cliente-tipo-pill{background:var(--primary-wash);}
+[data-theme="dark"] img,[data-theme="dark"] .drive-account-avatar img{filter:brightness(.92);}
+.theme-toggle{
+  border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+  border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:border-color .15s ease,background .15s ease;
+}
+.theme-toggle:hover{border-color:var(--primary);}
+
+.global-search-wrap{position:sticky;top:0;z-index:30;background:var(--bg);padding:14px 0 10px;}
+.global-search-box{position:relative;max-width:480px;}
+.global-search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+.global-search-box input{
+  width:100%;padding:10px 46px 10px 36px;border:1px solid var(--line-strong);border-radius:20px;
+  background:var(--surface);font-size:13px;color:var(--ink);
+}
+.global-search-box input:focus{border-color:var(--primary);}
+.global-search-kbd{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:10px;color:var(--muted);border:1px solid var(--line-strong);border-radius:5px;padding:2px 6px;
+  font-family:var(--font-mono);pointer-events:none;
+}
+.global-search-results{
+  position:absolute;top:calc(100% + 6px);left:0;width:100%;max-height:360px;overflow-y:auto;
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);
+  z-index:40;padding:6px;
+}
+.global-search-group{font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:700;padding:8px 10px 4px;}
+.global-search-item{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:8px 10px;border-radius:8px;
+  border:none;background:none;font-size:12.5px;color:var(--ink);cursor:pointer;
+}
+.global-search-item:hover{background:var(--primary-wash);}
+.gs-icon{flex:0 0 auto;}
+.gs-sub{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
+.global-search-empty{padding:16px;color:var(--muted);font-size:12.5px;text-align:center;}
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -134,6 +187,14 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 .login-links{text-align:center;font-size:11.5px;margin-top:18px;}
 .login-links a{color:var(--primary);font-weight:600;}
 .login-footnote{text-align:center;font-size:11px;color:var(--muted);margin-top:16px;}
+.field-pass-wrap{position:relative;}
+.field-pass-wrap input{padding-right:52px!important;}
+.field-pass-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;
+  color:var(--muted);font-size:10px;font-weight:700;letter-spacing:0.3px;text-transform:uppercase;
+  padding:5px 7px;border-radius:6px;cursor:pointer;
+}
+.field-pass-toggle:hover{color:var(--primary);background:var(--primary-wash);}
 @media (max-width:720px){
   .login-card-split{flex-direction:column;max-width:420px;min-height:0;}
   .login-visual{padding:30px 24px;}
@@ -188,6 +249,21 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 .quick{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 
 /* ---------- dashboard profissional ---------- */
+.dash-backup-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:12px 16px;border-radius:10px;margin-bottom:16px;
+  background:var(--danger-wash);border:1px solid var(--danger);color:var(--danger);font-size:12.5px;font-weight:600;
+}
+.dash-backup-banner button{flex:0 0 auto;}
+.faixas-atraso-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.faixa-atraso{border:1px solid var(--line);border-radius:10px;padding:13px 14px;background:#FBFAF6;border-left:3px solid var(--line-strong);}
+.faixa-atraso.nivel-1{border-left-color:var(--accent);}
+.faixa-atraso.nivel-2{border-left-color:#C9793B;}
+.faixa-atraso.nivel-3{border-left-color:var(--danger);}
+.faixa-atraso span{display:block;font-size:10.5px;color:var(--muted);margin-bottom:5px;}
+.faixa-atraso strong{display:block;font-family:var(--font-mono);font-size:17px;color:var(--ink);}
+.faixa-atraso small{display:block;font-size:10.5px;color:var(--muted);margin-top:3px;}
+@media (max-width:700px){ .faixas-atraso-grid{grid-template-columns:repeat(2,1fr);} }
 .dashboard-topbar{
   display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
   margin-bottom:20px;
@@ -590,6 +666,7 @@ tbody tr:hover{background:#FBFAF6;}
 .tag-concluido{background:var(--primary-wash);color:var(--primary);}
 .tag-ativa{background:var(--primary-wash);color:var(--primary);}
 .tag-inativa{background:#EAE8E0;color:var(--muted);}
+.tag-encerramento{background:var(--accent-wash);color:var(--accent);}
 .tag-outros{background:var(--accent-wash);color:var(--accent);}
 .codigo-chip{
   display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11.5px;font-weight:700;
@@ -598,58 +675,6 @@ tbody tr:hover{background:#FBFAF6;}
 }
 .codigo-chip::before{
   content:'●';font-size:7px;color:var(--accent);
-}
-
-/* ---------- Drive ---------- */
-.drive-accounts{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px;}
-.drive-account-chip{
-  display:flex;align-items:center;gap:9px;padding:7px 12px 7px 7px;border-radius:30px;
-  border:1.5px solid var(--line-strong);background:var(--surface);cursor:pointer;
-  transition:border-color .15s ease,background .15s ease;
-}
-.drive-account-chip:hover{border-color:var(--primary-light);}
-.drive-account-chip.ativo{border-color:var(--primary);background:var(--primary-wash);}
-.drive-account-avatar{
-  width:26px;height:26px;border-radius:50%;background:var(--primary);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;
-  flex:0 0 auto;overflow:hidden;
-}
-.drive-account-avatar img{width:100%;height:100%;object-fit:cover;}
-.drive-account-email{font-size:12.5px;font-weight:600;color:var(--ink);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.drive-account-remove{
-  border:none;background:none;color:var(--muted);font-size:15px;line-height:1;padding:2px 4px;border-radius:50%;
-}
-.drive-account-remove:hover{color:var(--danger);background:var(--danger-wash);}
-.drive-add-account{
-  display:flex;align-items:center;gap:6px;padding:8px 16px 8px 12px;border-radius:30px;
-  border:1.5px dashed var(--line-strong);background:transparent;color:var(--primary);
-  font-size:12.5px;font-weight:700;cursor:pointer;
-}
-.drive-add-account:hover{border-color:var(--primary);background:var(--primary-wash);}
-
-.drive-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
-.drive-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:4px;font-size:13px;color:var(--muted);}
-.drive-breadcrumb button{
-  border:none;background:none;color:var(--muted);font-size:13px;padding:3px 5px;border-radius:5px;cursor:pointer;
-}
-.drive-breadcrumb button:last-child{color:var(--primary);font-weight:700;}
-.drive-breadcrumb button:hover{background:var(--primary-wash);color:var(--primary);}
-.drive-breadcrumb .sep{color:var(--line-strong);}
-
-.drive-file-name{display:flex;align-items:center;gap:10px;}
-.drive-file-icon{
-  width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-  font-size:15px;flex:0 0 auto;background:var(--primary-wash);color:var(--primary);
-}
-.drive-file-icon.folder{background:var(--accent-wash);color:var(--accent);}
-.drive-file-row-name{font-weight:600;color:var(--ink);font-size:13.5px;cursor:pointer;}
-.drive-file-row-name:hover{color:var(--primary);text-decoration:underline;}
-
-.drive-empty{padding:60px 20px;text-align:center;color:var(--muted);}
-.drive-empty .drive-empty-icon{font-size:34px;margin-bottom:12px;}
-.drive-config-note{
-  margin-top:18px;padding:14px 18px;background:var(--accent-wash);border-radius:var(--radius);
-  font-size:12.5px;color:var(--ink);line-height:1.6;
 }
 
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap;}
@@ -845,6 +870,14 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 </style>
 </head>
 <body>
+<script>
+  // Aplica o tema salvo antes da tela renderizar, evitando um "flash" de tema claro.
+  try{
+    if(localStorage.getItem('crm-theme') === 'dark'){
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  }catch(e){}
+</script>
 
 <div class="login-screen" id="login-screen">
   <div class="login-card-split">
@@ -922,16 +955,13 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Financeiro
       </button>
-      <button class="nav-btn" data-view="drive">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-        Drive
-      </button>
       <button class="nav-btn" data-view="sistema">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Sistema
       </button>
     </nav>
     <div class="sidebar-foot">
+      <button class="theme-toggle" id="btn-theme-toggle" type="button" style="margin-bottom:10px;">🌙 Modo escuro</button>
       <div id="sidebar-user-info" style="margin-bottom:6px;"></div>
       <div>Dados salvos automaticamente e compartilhados com a equipe.</div>
     </div>
@@ -940,8 +970,19 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   <!-- MAIN -->
   <main class="main">
 
+    <div class="global-search-wrap" id="global-search-wrap">
+      <div class="global-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="global-search-input" placeholder="Buscar cliente, cobrança ou serviço...">
+        <kbd class="global-search-kbd">/</kbd>
+        <div class="global-search-results" id="global-search-results" style="display:none;"></div>
+      </div>
+    </div>
+
     <!-- DASHBOARD -->
     <section class="view active" id="view-dashboard">
+
+      <div id="dash-backup-alerta"></div>
 
       <div class="dashboard-topbar">
         <div class="dashboard-heading">
@@ -1078,6 +1119,18 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <div id="pendencias-container"></div>
         </div>
 
+      </div>
+
+      <div class="dashboard-panel" style="margin-bottom:18px;">
+        <div class="dashboard-panel-head">
+          <div>
+            <span class="section-kicker">COBRANÇA</span>
+            <h2>Vencendo nos próximos 3 dias</h2>
+            <p>Cobranças em aberto que vencem em breve.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btn-lembrete-vencimentos" style="display:none;">📲 Enviar lembretes por WhatsApp</button>
+        </div>
+        <div id="vencimentos-proximos-container"></div>
       </div>
 
       <div class="dashboard-secondary-grid">
@@ -1283,6 +1336,11 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <div id="chart-recebimentos"></div>
       </div>
 
+      <div class="card" style="padding:20px 22px;margin-bottom:26px;">
+        <div class="card-label" style="margin-bottom:10px;">Inadimplência por tempo de atraso</div>
+        <div id="faixas-atraso-container"></div>
+      </div>
+
       <div style="border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:16px;">
         <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin:0;">A Receber</h2>
         <div class="view-desc" style="margin-top:2px;">Cobranças geradas automaticamente a partir dos serviços cadastrados</div>
@@ -1309,55 +1367,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         </div>
         <div id="pagamentos-container"></div>
       </div>
-    </section>
-
-    <!-- DRIVE -->
-    <section class="view" id="view-drive">
-      <div class="view-header">
-        <div>
-          <h1 class="view-title">Drive</h1>
-          <div class="view-desc">Conecte contas do Google Drive da equipe para enviar e baixar arquivos</div>
-        </div>
-        <div style="display:flex;gap:10px;">
-          <input type="file" id="drive-upload-input" multiple style="display:none;">
-          <button class="btn btn-ghost" id="btn-drive-atualizar">↻ Atualizar</button>
-          <button class="btn" id="btn-drive-upload" disabled>⬆ Enviar arquivo</button>
-        </div>
-      </div>
-
-      <div class="card" style="padding:20px 22px;margin-bottom:22px;border-left:3px solid var(--accent);">
-        <div class="card-label" style="margin-bottom:6px;">⚡ Acesso rápido — sem nenhuma configuração</div>
-        <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px;">
-          Se você já estiver logado com sua conta Google no navegador (o mesmo login do Gmail, por exemplo),
-          pode abrir o Google Drive direto numa aba nova — grátis, sem precisar configurar nada abaixo.
-          Lá você já tem enviar, baixar e organizar arquivos com a própria interface do Google, e para trocar
-          de conta é só usar o seletor de contas no canto superior direito da página do Google.
-        </div>
-        <button class="btn" id="btn-drive-abrir-simples" type="button">↗ Abrir o Google Drive numa aba nova</button>
-      </div>
-
-      <div style="border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px;">
-        <h2 style="font-family:var(--font-display);font-size:16px;font-weight:600;margin:0;color:var(--ink);">Acesso integrado (avançado)</h2>
-        <div class="view-desc" style="margin-top:2px;">Opcional — exige configurar uma credencial gratuita do Google (veja em Sistema). Deixa os arquivos embutidos aqui dentro do sistema, sem abrir aba nova.</div>
-      </div>
-
-      <div class="drive-accounts" id="drive-accounts"></div>
-
-      <div id="drive-config-warning"></div>
-
-      <div id="drive-browser-wrap" style="display:none;">
-        <div class="drive-toolbar">
-          <div class="drive-breadcrumb" id="drive-breadcrumb"></div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Nome</th><th>Modificado</th><th>Tamanho</th><th style="text-align:right;">Ações</th></tr></thead>
-            <tbody id="drive-files-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="drive-empty-state"></div>
     </section>
 
     <!-- FICHA -->
@@ -1402,23 +1411,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
             <li>Salve e hospede o arquivo em qualquer site gratuito (Netlify, GitHub Pages, Cloudflare Pages...)</li>
           </ol>
           <div style="font-size:12px;color:var(--muted);line-height:1.5;">🔒 Com login ativado, só quem tiver e-mail e senha cadastrados pelo administrador consegue ver ou alterar os dados — mesmo que alguém encontre o link do site.</div>
-        </div>
-
-        <div class="card" style="padding:22px 24px;">
-          <div class="card-label" style="margin-bottom:8px;">Menu Drive (Google)</div>
-          <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px;">
-            O menu <strong>Drive</strong> permite que cada pessoa da equipe conecte a própria conta do Google
-            (o login acontece na própria tela do Google — este sistema nunca vê nem guarda a senha de ninguém)
-            para enviar e baixar arquivos, com mais de uma conta conectada ao mesmo tempo. Para ativar:
-          </div>
-          <ol style="font-size:12.5px;color:var(--muted);line-height:1.9;margin:0 0 12px;padding-left:20px;">
-            <li>Acesse <strong style="color:var(--ink);">console.cloud.google.com</strong>, crie um projeto gratuito e, em <strong style="color:var(--ink);">APIs e Serviços → Biblioteca</strong>, ative a <strong style="color:var(--ink);">Google Drive API</strong></li>
-            <li>Em <strong style="color:var(--ink);">APIs e Serviços → Tela de consentimento OAuth</strong>, configure como "Externo", preencha os dados básicos e, na aba <strong style="color:var(--ink);">Test users</strong>, adicione os e-mails do Google de cada pessoa da equipe que vai usar o Drive</li>
-            <li>Em <strong style="color:var(--ink);">APIs e Serviços → Credenciais → Criar credenciais → ID do cliente OAuth</strong>, escolha o tipo "Aplicativo da Web"</li>
-            <li>Em <strong style="color:var(--ink);">Origens JavaScript autorizadas</strong>, adicione o endereço onde este sistema está publicado (ex.: <font face="monospace">https://seu-usuario.github.io</font>)</li>
-            <li>Copie o <strong style="color:var(--ink);">Client ID</strong> gerado e cole na constante <strong style="color:var(--ink);">GOOGLE_CLIENT_ID</strong>, no topo do arquivo (perto de SUPABASE_URL)</li>
-          </ol>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5;">⚠️ Enquanto o app não passar pela verificação do Google (processo opcional, só necessário para uso público em grande escala), aparecerá um aviso "O Google não verificou este app" — isso é normal; quem estiver na lista de "Test users" pode clicar em "Avançado → Acessar" e continuar normalmente.</div>
         </div>
 
         <div class="card" style="padding:22px 24px;">
@@ -1598,7 +1590,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
             </select>
           </div>
           <div class="field"><label>Status</label>
-            <select id="f-cliente-status"><option>Ativa</option><option>Inativa</option><option>Outros</option></select>
+            <select id="f-cliente-status"><option>Ativa</option><option>Em encerramento</option><option>Inativa</option></select>
           </div>
         </div>
 
@@ -1616,8 +1608,20 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           Acessos e observações
         </div>
         <div class="field-row">
-          <div class="field"><label>Código de acesso</label><input type="text" id="f-cliente-codacesso"></div>
-          <div class="field"><label>Senha ECAC</label><input type="text" id="f-cliente-senhagov"></div>
+          <div class="field">
+            <label>Código de acesso</label>
+            <div class="field-pass-wrap">
+              <input type="password" id="f-cliente-codacesso" autocomplete="off">
+              <button type="button" class="field-pass-toggle" data-toggle-for="f-cliente-codacesso">Ver</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Senha ECAC</label>
+            <div class="field-pass-wrap">
+              <input type="password" id="f-cliente-senhagov" autocomplete="off">
+              <button type="button" class="field-pass-toggle" data-toggle-for="f-cliente-senhagov">Ver</button>
+            </div>
+          </div>
         </div>
         <div class="field"><label>Observações</label><textarea id="f-cliente-obs" placeholder="Informações adicionais sobre o cliente..."></textarea></div>
       </div>
@@ -1735,6 +1739,10 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   <div class="modal confirm-modal">
     <h3>Excluir registro</h3>
     <p id="confirm-text">Esta ação não pode ser desfeita. Deseja continuar?</p>
+    <div id="confirm-require-wrap" style="display:none;margin-top:6px;">
+      <label id="confirm-require-label" style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;"></label>
+      <input type="text" id="confirm-require-input" placeholder="Digite aqui para confirmar">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" data-close="overlay-confirm">Cancelar</button>
       <button class="btn btn-danger" id="confirm-yes" style="background:var(--danger);color:#fff;">Excluir</button>
@@ -1849,15 +1857,6 @@ const SUPABASE_URL = 'https://pcbvquzpdwiwontuhkpr.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_kkQcC98fymStZesapNhh7g_73zkDLWr';
 const SUPABASE_TABLE = 'sistema_dados';
 const SUPABASE_ROW_ID = 'principal';
-
-/* ============================================================
-   CONFIGURAÇÃO DRIVE — GOOGLE (opcional)
-   Deixe em branco para não usar o menu Drive. Para conectar contas
-   do Google Drive, crie um "OAuth Client ID" gratuito no Google Cloud
-   Console e cole o valor abaixo. Veja o passo a passo no menu
-   Drive → "Como configurar".
-   ============================================================ */
-const GOOGLE_CLIENT_ID = '';
 
 let supabaseClient = null;
 function useSupabase(){
@@ -2183,7 +2182,6 @@ function switchView(view){
   document.getElementById('view-'+view).classList.add('active');
   if(view!=='ficha') renderAll();
   if(view==='sistema') renderSistemaSettings();
-  if(view==='drive') renderDriveView();
 }
 
 /* ================= MODAL HELPERS ================= */
@@ -2197,14 +2195,42 @@ document.querySelectorAll('.overlay').forEach(ov=>{
 });
 
 let confirmCallback = null;
-function askConfirm(text, cb){
+let confirmRequireText = null;
+function askConfirm(text, cb, requireText){
   document.getElementById('confirm-text').textContent = text;
   confirmCallback = cb;
+  confirmRequireText = requireText || null;
+  const wrap = document.getElementById('confirm-require-wrap');
+  const input = document.getElementById('confirm-require-input');
+  const yesBtn = document.getElementById('confirm-yes');
+  if(confirmRequireText){
+    wrap.style.display = 'block';
+    input.value = '';
+    document.getElementById('confirm-require-label').textContent = `Para confirmar, digite "${confirmRequireText}" abaixo:`;
+    yesBtn.disabled = true;
+    yesBtn.style.opacity = '0.5';
+  } else {
+    wrap.style.display = 'none';
+    yesBtn.disabled = false;
+    yesBtn.style.opacity = '1';
+  }
   openOverlay('overlay-confirm');
 }
+document.getElementById('confirm-require-input').addEventListener('input', ()=>{
+  const yesBtn = document.getElementById('confirm-yes');
+  const val = document.getElementById('confirm-require-input').value.trim().toLowerCase();
+  const ok = !confirmRequireText || val === confirmRequireText.trim().toLowerCase();
+  yesBtn.disabled = !ok;
+  yesBtn.style.opacity = ok ? '1' : '0.5';
+});
 document.getElementById('confirm-yes').addEventListener('click', ()=>{
+  if(confirmRequireText){
+    const val = document.getElementById('confirm-require-input').value.trim().toLowerCase();
+    if(val !== confirmRequireText.trim().toLowerCase()) return;
+  }
   if(confirmCallback) confirmCallback();
   confirmCallback = null;
+  confirmRequireText = null;
   closeOverlay('overlay-confirm');
 });
 
@@ -2258,8 +2284,33 @@ function renderDashboard(){
   const totalAReceber = DATA.charges.reduce((s,ch)=> s + Math.max(ch.valorTotal - chargePago(ch.id), 0), 0);
   document.getElementById('kpi-receber').textContent = fmtMoney(totalAReceber);
   renderPendencias();
+  renderVencimentosProximos();
   renderProximosAgenda();
   renderAtividadeRecente();
+  renderAlertaBackupDashboard();
+}
+
+/* Aviso visível no topo do Dashboard quando o backup manual está atrasado
+   (mais de 7 dias) ou nunca foi feito — não depende de a pessoa lembrar de
+   visitar a tela Sistema. */
+function renderAlertaBackupDashboard(){
+  const el = document.getElementById('dash-backup-alerta');
+  if(!el) return;
+  const last = DATA.settings && DATA.settings.lastBackupAt;
+  let texto = '';
+  if(!last){
+    texto = '⚠️ Você ainda não fez nenhuma cópia de segurança dos dados.';
+  } else {
+    const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+    if(dias > 7){
+      texto = `⚠️ Última cópia de segurança há ${dias} dias. Recomendamos baixar uma nova.`;
+    }
+  }
+  if(!texto){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="dash-backup-banner">
+    <span>${texto}</span>
+    <button class="btn btn-sm" style="background:var(--danger);color:#fff;" onclick="switchView('sistema')">Fazer backup agora</button>
+  </div>`;
 }
 
 /* Agrega os eventos mais recentes de todo o sistema (novos clientes, serviços
@@ -2326,6 +2377,51 @@ function renderPendencias(){
 
   container.innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>Cliente</th><th>Serviço</th><th>Prazo</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+/* Cobranças em aberto que vencem nos próximos N dias (hoje incluso). */
+function cobrancasVencendoEmBreve(dias){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const limite = new Date(hoje); limite.setDate(limite.getDate() + dias);
+  const hojeIso = hoje.toISOString().slice(0,10);
+  const limiteIso = limite.toISOString().slice(0,10);
+  return DATA.charges.filter(ch=>{
+    const saldo = Number(ch.valorTotal||0) - chargePago(ch.id);
+    if(saldo <= 0.009 || !ch.vencimento) return false;
+    return ch.vencimento >= hojeIso && ch.vencimento <= limiteIso;
+  }).sort((a,b)=>(a.vencimento||'').localeCompare(b.vencimento||''));
+}
+
+function renderVencimentosProximos(){
+  const container = document.getElementById('vencimentos-proximos-container');
+  const btnLote = document.getElementById('btn-lembrete-vencimentos');
+  if(!container) return;
+  const lista = cobrancasVencendoEmBreve(3);
+  const hojeIso = new Date().toISOString().slice(0,10);
+
+  if(lista.length===0){
+    container.innerHTML = `<div class="empty" style="padding:26px 16px;"><p>Nenhuma cobrança vencendo nos próximos 3 dias. ✅</p></div>`;
+    if(btnLote) btnLote.style.display = 'none';
+    return;
+  }
+  if(btnLote) btnLote.style.display = 'inline-flex';
+
+  const rows = lista.map(ch=>{
+    const c = DATA.clients.find(x=>x.id===ch.clientId);
+    const saldo = Number(ch.valorTotal||0) - chargePago(ch.id);
+    const venceHoje = ch.vencimento === hojeIso;
+    return `<tr>
+      <td><strong>${escapeHtml(c ? c.nome : '—')}</strong></td>
+      <td>${escapeHtml(ch.descricao||'—')}</td>
+      <td style="${venceHoje?'color:var(--accent);font-weight:600;':''}">${fmtDate(ch.vencimento)}${venceHoje?' · hoje':''}</td>
+      <td class="num">${fmtMoney(saldo)}</td>
+      <td>${c && c.telefone ? `<button class="icon-btn" title="Enviar lembrete no WhatsApp" onclick="abrirLembreteVencimento('${ch.id}')">💬</button>` : '<span style="color:var(--muted);font-size:11px;">sem telefone</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Cliente</th><th>Descrição</th><th>Vencimento</th><th style="text-align:right;">Valor</th><th></th></tr></thead>
     <tbody>${rows}</tbody></table></div>`;
 }
 
@@ -2554,6 +2650,7 @@ function clientDoc(c){
 function statusTagClass(status){
   if(status==='Ativa') return 'tag-ativa';
   if(status==='Inativa') return 'tag-inativa';
+  if(status==='Em encerramento') return 'tag-encerramento';
   return 'tag-outros';
 }
 function renderClientes(){
@@ -2702,14 +2799,21 @@ function editarCliente(id){
   if(c) openClienteModal(c);
 }
 function excluirCliente(id){
-  askConfirm('Excluir este cliente também removerá suas coletas, serviços e pagamentos associados. Deseja continuar?', ()=>{
-    DATA.clients = DATA.clients.filter(c=>c.id!==id);
-    DATA.collections = DATA.collections.filter(c=>c.clientId!==id);
-    DATA.services = DATA.services.filter(s=>s.clientId!==id);
-    DATA.payments = DATA.payments.filter(p=>p.clientId!==id);
-    saveData(); renderAll();
-    showToast('Cliente excluído.');
-  });
+  const c = DATA.clients.find(x=>x.id===id);
+  if(!c) return;
+  askConfirm(
+    `Excluir "${c.nome}" também removerá suas coletas, serviços, cobranças e pagamentos associados. Esta ação não pode ser desfeita.`,
+    ()=>{
+      DATA.clients = DATA.clients.filter(x=>x.id!==id);
+      DATA.collections = DATA.collections.filter(x=>x.clientId!==id);
+      DATA.services = DATA.services.filter(x=>x.clientId!==id);
+      DATA.payments = DATA.payments.filter(x=>x.clientId!==id);
+      DATA.charges = DATA.charges.filter(x=>x.clientId!==id);
+      saveData(); renderAll();
+      showToast('Cliente excluído.');
+    },
+    c.nome
+  );
 }
 document.getElementById('salvar-cliente').addEventListener('click', ()=>{
   const nome = document.getElementById('f-cliente-nome').value.trim();
@@ -3053,6 +3157,47 @@ function renderPagamentosDashboard(){
 
   renderChartRecebimentos('chart-recebimentos');
   renderChartRecebimentos('dash-chart-recebimentos');
+  renderFaixasAtraso();
+}
+
+/* Agrupa as cobranças em aberto por faixa de atraso (visão de aging),
+   ajudando a priorizar quais cobranças cobrar primeiro. */
+function renderFaixasAtraso(){
+  const container = document.getElementById('faixas-atraso-container');
+  if(!container) return;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const faixas = { ate30: {total:0, count:0}, ate60: {total:0, count:0}, ate90: {total:0, count:0}, mais90: {total:0, count:0} };
+
+  DATA.charges.forEach(ch=>{
+    const saldo = Number(ch.valorTotal||0) - chargePago(ch.id);
+    if(saldo <= 0.009 || !ch.vencimento) return;
+    const venc = new Date(ch.vencimento+'T00:00:00');
+    const diasAtraso = Math.floor((hoje - venc) / 86400000);
+    if(diasAtraso <= 0) return; // ainda não venceu
+    let faixa = diasAtraso <= 30 ? 'ate30' : diasAtraso <= 60 ? 'ate60' : diasAtraso <= 90 ? 'ate90' : 'mais90';
+    faixas[faixa].total += saldo;
+    faixas[faixa].count += 1;
+  });
+
+  const defs = [
+    { key:'ate30', label:'Até 30 dias', nivel:'nivel-1' },
+    { key:'ate60', label:'31 a 60 dias', nivel:'nivel-2' },
+    { key:'ate90', label:'61 a 90 dias', nivel:'nivel-2' },
+    { key:'mais90', label:'Mais de 90 dias', nivel:'nivel-3' },
+  ];
+  const totalGeral = Object.values(faixas).reduce((s,f)=>s+f.total,0);
+  if(totalGeral <= 0.009){
+    container.innerHTML = `<div class="empty" style="padding:20px 10px;"><p>Nenhuma cobrança em atraso no momento. ✅</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="faixas-atraso-grid">${defs.map(d=>{
+    const f = faixas[d.key];
+    return `<div class="faixa-atraso ${d.nivel}">
+      <span>${d.label}</span>
+      <strong>${fmtMoney(f.total)}</strong>
+      <small>${f.count} cobrança${f.count!==1?'s':''}</small>
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function renderChartRecebimentos(containerId){
@@ -3247,14 +3392,14 @@ const WHATSAPP_TEMPLATES = {
   aviso: (c) => `Olá, ${c.nome}! 👋\n\nSegue um comunicado do escritório Contabilidade Miranda:\n[escreva aqui o aviso]`,
 };
 
-function abrirMensagemWhatsapp(clientId){
+function abrirMensagemWhatsapp(clientId, modeloForcado, textoForcado){
   const c = DATA.clients.find(c=>c.id===clientId);
   if(!c) return;
   if(!c.telefone){ showToast('Este cliente não tem telefone cadastrado.'); return; }
   currentWhatsappClientId = clientId;
   document.getElementById('whatsapp-cliente-info').textContent = `Para: ${c.nome} · ${c.telefone}`;
-  document.getElementById('f-whatsapp-modelo').value = 'branco';
-  document.getElementById('f-whatsapp-texto').value = '';
+  document.getElementById('f-whatsapp-modelo').value = modeloForcado || 'branco';
+  document.getElementById('f-whatsapp-texto').value = textoForcado || '';
   openOverlay('overlay-whatsapp');
 }
 document.getElementById('f-whatsapp-modelo').addEventListener('change', ()=>{
@@ -3271,7 +3416,43 @@ document.getElementById('enviar-whatsapp-cliente').addEventListener('click', ()=
   if(!texto){ showToast('Escreva uma mensagem ou escolha um modelo.'); return; }
   window.open(whatsappUrl(c.telefone, texto), '_blank');
   closeOverlay('overlay-whatsapp');
+  if(lembreteQueue.length>0){
+    showToast(`Lembrete enviado. Restam ${lembreteQueue.length} — abrindo o próximo...`);
+    setTimeout(processarProximoLembrete, 900);
+  }
 });
+
+/* Lembrete de vencimento — mensagem individual e envio em lote */
+function textoLembreteVencimento(charge){
+  const c = DATA.clients.find(x=>x.id===charge.clientId);
+  if(!c) return '';
+  const saldo = Number(charge.valorTotal||0) - chargePago(charge.id);
+  const hojeIso = new Date().toISOString().slice(0,10);
+  const quando = charge.vencimento===hojeIso ? 'vence hoje' : `vence em ${fmtDate(charge.vencimento)}`;
+  return `Olá, ${c.nome}! 👋\n\nPassando para lembrar que a cobrança referente a "${charge.descricao||'honorário'}", no valor de ${fmtMoney(saldo)}, ${quando}.\n\nQualquer dúvida sobre o pagamento, estamos à disposição!`;
+}
+function abrirLembreteVencimento(chargeId){
+  const ch = DATA.charges.find(x=>x.id===chargeId);
+  if(!ch) return;
+  abrirMensagemWhatsapp(ch.clientId, 'cobranca', textoLembreteVencimento(ch));
+}
+let lembreteQueue = [];
+function iniciarLembretesEmLote(){
+  const lista = cobrancasVencendoEmBreve(3).filter(ch=>{
+    const c = DATA.clients.find(x=>x.id===ch.clientId);
+    return c && c.telefone;
+  });
+  if(lista.length===0){ showToast('Nenhuma cobrança com telefone cadastrado para lembrar.'); return; }
+  lembreteQueue = lista.map(ch=>ch.id);
+  showToast(`Enviando lembretes: ${lembreteQueue.length} no total. Confirme o envio de cada um.`);
+  processarProximoLembrete();
+}
+function processarProximoLembrete(){
+  if(lembreteQueue.length===0) return;
+  const chargeId = lembreteQueue.shift();
+  abrirLembreteVencimento(chargeId);
+}
+document.getElementById('btn-lembrete-vencimentos').addEventListener('click', iniciarLembretesEmLote);
 
 /* ================= RENDER: PAGAMENTOS AVULSOS / CLIENTE (não vinculados a cobrança) ================= */
 function tipoLancamentoLabel(p){
@@ -3871,7 +4052,7 @@ function renderAvisoBackup(){
   }
   const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
   const dataFmt = new Date(last).toLocaleDateString('pt-BR');
-  if(dias > 14){
+  if(dias > 7){
     el.innerHTML = `⚠️ Última cópia de segurança há ${dias} dias (${dataFmt}). Recomendamos baixar uma nova.`;
     el.style.color = 'var(--danger)';
   } else {
@@ -3998,12 +4179,124 @@ document.getElementById('btn-login').addEventListener('click', fazerLogin);
 document.getElementById('login-senha').addEventListener('keydown', (e)=>{ if(e.key==='Enter') fazerLogin(); });
 document.getElementById('login-email').addEventListener('keydown', (e)=>{ if(e.key==='Enter') fazerLogin(); });
 document.getElementById('link-esqueci-senha').addEventListener('click', (e)=>{ e.preventDefault(); esqueciSenha(); });
+function aplicarThemeToggleLabel(){
+  const btn = document.getElementById('btn-theme-toggle');
+  if(!btn) return;
+  const escuro = document.documentElement.getAttribute('data-theme') === 'dark';
+  btn.textContent = escuro ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+document.getElementById('btn-theme-toggle').addEventListener('click', ()=>{
+  const escuroAtual = document.documentElement.getAttribute('data-theme') === 'dark';
+  if(escuroAtual){
+    document.documentElement.removeAttribute('data-theme');
+    try{ localStorage.setItem('crm-theme', 'light'); }catch(e){}
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    try{ localStorage.setItem('crm-theme', 'dark'); }catch(e){}
+  }
+  aplicarThemeToggleLabel();
+});
+aplicarThemeToggleLabel();
+
+/* ================= BUSCA GLOBAL (cliente, cobrança, serviço) ================= */
+function globalSearchExecute(term){
+  const t = (term||'').toLowerCase().trim();
+  const results = document.getElementById('global-search-results');
+  if(!t){ results.style.display = 'none'; results.innerHTML = ''; return; }
+
+  const clientMatches = DATA.clients.filter(c=>
+    (c.nome||'').toLowerCase().includes(t) ||
+    String(c.codigo||'').includes(t) ||
+    clientDoc(c).toLowerCase().includes(t) ||
+    (c.contato||c.telefone||'').toLowerCase().includes(t)
+  ).slice(0,5);
+
+  const chargeMatches = DATA.charges.filter(ch=>{
+    const c = DATA.clients.find(x=>x.id===ch.clientId);
+    return (ch.descricao||'').toLowerCase().includes(t) || (c && c.nome.toLowerCase().includes(t));
+  }).slice(0,5);
+
+  const serviceMatches = DATA.services.filter(s=>{
+    const c = DATA.clients.find(x=>x.id===s.clientId);
+    const itens = servicoItens(s).join(' ').toLowerCase();
+    return itens.includes(t) || (c && c.nome.toLowerCase().includes(t)) || (s.tipoServico||'').toLowerCase().includes(t);
+  }).slice(0,5);
+
+  if(!clientMatches.length && !chargeMatches.length && !serviceMatches.length){
+    results.innerHTML = `<div class="global-search-empty">Nenhum resultado para "${escapeHtml(term)}"</div>`;
+    results.style.display = 'block';
+    return;
+  }
+
+  let html = '';
+  if(clientMatches.length){
+    html += `<div class="global-search-group">Clientes</div>` + clientMatches.map(c=>`
+      <button type="button" class="global-search-item" onclick="globalSearchGoTo('cliente','${c.id}')">
+        <span class="gs-icon">👤</span><span>${escapeHtml(c.nome)}</span><span class="gs-sub">${escapeHtml(clientDoc(c)||'')}</span>
+      </button>`).join('');
+  }
+  if(chargeMatches.length){
+    html += `<div class="global-search-group">Cobranças</div>` + chargeMatches.map(ch=>{
+      const c = DATA.clients.find(x=>x.id===ch.clientId);
+      return `<button type="button" class="global-search-item" onclick="globalSearchGoTo('cobranca','${ch.id}')">
+        <span class="gs-icon">💰</span><span>${escapeHtml(ch.descricao||'Cobrança')}</span><span class="gs-sub">${escapeHtml(c?c.nome:'')}</span>
+      </button>`;
+    }).join('');
+  }
+  if(serviceMatches.length){
+    html += `<div class="global-search-group">Serviços</div>` + serviceMatches.map(s=>{
+      const c = DATA.clients.find(x=>x.id===s.clientId);
+      const itens = servicoItens(s);
+      return `<button type="button" class="global-search-item" onclick="globalSearchGoTo('servico','${s.id}')">
+        <span class="gs-icon">🛠️</span><span>${escapeHtml(itens[0]||s.tipoServico||'Serviço')}</span><span class="gs-sub">${escapeHtml(c?c.nome:'')}</span>
+      </button>`;
+    }).join('');
+  }
+  results.innerHTML = html;
+  results.style.display = 'block';
+}
+function globalSearchGoTo(tipo, id){
+  document.getElementById('global-search-input').value = '';
+  document.getElementById('global-search-results').style.display = 'none';
+  if(tipo==='cliente'){ switchView('clientes'); setTimeout(()=>abrirFicha(id), 50); }
+  if(tipo==='cobranca'){ switchView('pagamentos'); }
+  if(tipo==='servico'){ switchView('servicos'); setTimeout(()=>editarServico(id), 50); }
+}
+document.getElementById('global-search-input').addEventListener('input', (e)=> globalSearchExecute(e.target.value));
+document.getElementById('global-search-input').addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){ e.target.blur(); document.getElementById('global-search-results').style.display='none'; }
+});
+document.addEventListener('click', (e)=>{
+  const wrap = document.getElementById('global-search-wrap');
+  if(wrap && !wrap.contains(e.target)) document.getElementById('global-search-results').style.display = 'none';
+});
+document.addEventListener('keydown', (e)=>{
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  const isTyping = tag==='INPUT' || tag==='TEXTAREA' || tag==='SELECT';
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){
+    e.preventDefault();
+    document.getElementById('global-search-input').focus();
+  } else if(e.key==='/' && !isTyping){
+    e.preventDefault();
+    document.getElementById('global-search-input').focus();
+  }
+});
+
 document.getElementById('btn-toggle-senha').addEventListener('click', ()=>{
   const campo = document.getElementById('login-senha');
   const btn = document.getElementById('btn-toggle-senha');
   const oculto = campo.type === 'password';
   campo.type = oculto ? 'text' : 'password';
   btn.textContent = oculto ? 'Ocultar' : 'Ver';
+});
+document.querySelectorAll('.field-pass-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const campo = document.getElementById(btn.dataset.toggleFor);
+    if(!campo) return;
+    const oculto = campo.type === 'password';
+    campo.type = oculto ? 'text' : 'password';
+    btn.textContent = oculto ? 'Ocultar' : 'Ver';
+  });
 });
 
 /* ================= DESCONEXÃO AUTOMÁTICA POR INATIVIDADE ================= */
@@ -4028,345 +4321,6 @@ setInterval(()=>{
     desconectarPorInatividade();
   }
 }, 30000);
-
-/* ================= DRIVE (Google) =================
-   Cada pessoa da equipe conecta a própria conta do Google (login feito
-   na tela oficial do Google, nunca dentro deste sistema — o sistema
-   nunca vê nem guarda a senha do Google de ninguém). É possível conectar
-   mais de uma conta ao mesmo tempo e alternar entre elas. */
-let driveTokenClient = null;
-let driveAccounts = [];      // { email, name, picture, accessToken, expiresAt }
-let driveActiveEmail = null;
-let driveStack = [];         // pilha de pastas [{id,name}] para o breadcrumb
-
-function driveConfigured(){
-  return !!GOOGLE_CLIENT_ID;
-}
-function driveGoogleLibPronta(){
-  return typeof google !== 'undefined' && google.accounts && google.accounts.oauth2;
-}
-
-function driveInitClient(){
-  if(driveTokenClient || !driveConfigured() || !driveGoogleLibPronta()) return;
-  driveTokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/drive',
-    callback: async (resp)=>{
-      if(!resp || resp.error){ showToast('Não foi possível conectar a conta do Google.'); return; }
-      try{
-        const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: 'Bearer '+resp.access_token }
-        });
-        const user = await userRes.json();
-        const conta = {
-          email: user.email,
-          name: user.name || user.email,
-          picture: user.picture || '',
-          accessToken: resp.access_token,
-          expiresAt: Date.now() + (Number(resp.expires_in||3600) * 1000),
-        };
-        driveAccounts = driveAccounts.filter(a=>a.email!==conta.email);
-        driveAccounts.push(conta);
-        driveActiveEmail = conta.email;
-        driveStack = [{id:'root', name:'Meu Drive'}];
-        renderDriveAccounts();
-        driveCarregarPasta('root');
-      }catch(e){
-        showToast('Conta conectada, mas não foi possível obter os dados do perfil.');
-      }
-    },
-  });
-}
-
-function driveConectarConta(){
-  if(!driveConfigured()){ renderDriveView(); return; }
-  if(!driveGoogleLibPronta()){ showToast('Carregando o conector do Google, tente novamente em instantes.'); return; }
-  driveInitClient();
-  driveTokenClient.requestAccessToken({ prompt: 'select_account consent' });
-}
-
-function driveContaAtiva(){
-  return driveAccounts.find(a=>a.email===driveActiveEmail) || null;
-}
-
-function driveIniciais(nome){
-  return (nome||'?').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
-}
-
-function renderDriveAccounts(){
-  const wrap = document.getElementById('drive-accounts');
-  if(!wrap) return;
-  const chips = driveAccounts.map(a=>`
-    <div class="drive-account-chip ${a.email===driveActiveEmail?'ativo':''}" data-email="${escapeHtml(a.email)}">
-      <div class="drive-account-avatar">${a.picture ? `<img src="${escapeHtml(a.picture)}" alt="">` : driveIniciais(a.name)}</div>
-      <span class="drive-account-email">${escapeHtml(a.email)}</span>
-      <button class="drive-account-remove" type="button" data-remove="${escapeHtml(a.email)}" title="Desconectar esta conta">×</button>
-    </div>
-  `).join('');
-  wrap.innerHTML = chips + `<button class="drive-add-account" type="button" id="btn-drive-add-account">+ Conectar conta Google</button>`;
-
-  wrap.querySelectorAll('.drive-account-chip').forEach(chip=>{
-    chip.addEventListener('click', (e)=>{
-      if(e.target.closest('[data-remove]')) return;
-      driveActiveEmail = chip.dataset.email;
-      driveStack = [{id:'root', name:'Meu Drive'}];
-      renderDriveAccounts();
-      driveCarregarPasta('root');
-    });
-  });
-  wrap.querySelectorAll('[data-remove]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      const email = btn.dataset.remove;
-      const conta = driveAccounts.find(a=>a.email===email);
-      if(conta && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2){
-        try{ google.accounts.oauth2.revoke(conta.accessToken); }catch(err){}
-      }
-      driveAccounts = driveAccounts.filter(a=>a.email!==email);
-      if(driveActiveEmail===email) driveActiveEmail = driveAccounts.length ? driveAccounts[0].email : null;
-      renderDriveAccounts();
-      if(driveActiveEmail){ driveStack = [{id:'root', name:'Meu Drive'}]; driveCarregarPasta('root'); }
-      else renderDriveView();
-    });
-  });
-  const addBtn = document.getElementById('btn-drive-add-account');
-  if(addBtn) addBtn.addEventListener('click', driveConectarConta);
-
-  document.getElementById('btn-drive-upload').disabled = !driveActiveEmail;
-}
-
-function driveFormatarTamanho(bytes){
-  if(!bytes) return '—';
-  const n = Number(bytes);
-  if(n < 1024) return n + ' B';
-  if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
-  if(n < 1024*1024*1024) return (n/(1024*1024)).toFixed(1) + ' MB';
-  return (n/(1024*1024*1024)).toFixed(1) + ' GB';
-}
-
-function driveEhPasta(mimeType){
-  return mimeType === 'application/vnd.google-apps.folder';
-}
-
-async function driveApiFetch(url, options){
-  const conta = driveContaAtiva();
-  if(!conta) throw new Error('Nenhuma conta conectada');
-  const res = await fetch(url, {
-    ...options,
-    headers: { ...(options && options.headers), Authorization: 'Bearer '+conta.accessToken },
-  });
-  if(res.status===401){
-    showToast('A conexão com o Google expirou. Clique na conta para reconectar.');
-    throw new Error('token expirado');
-  }
-  return res;
-}
-
-async function driveCarregarPasta(folderId){
-  const conta = driveContaAtiva();
-  const filesBody = document.getElementById('drive-files-body');
-  const wrap = document.getElementById('drive-browser-wrap');
-  const empty = document.getElementById('drive-empty-state');
-  if(!conta){ renderDriveView(); return; }
-  wrap.style.display = 'block';
-  empty.innerHTML = '';
-  filesBody.innerHTML = `<tr><td colspan="4" style="color:var(--muted);">Carregando…</td></tr>`;
-  renderDriveBreadcrumb();
-  try{
-    const q = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
-    const fields = encodeURIComponent('files(id,name,mimeType,size,modifiedTime)');
-    const res = await driveApiFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=${fields}&orderBy=folder,name&pageSize=200`);
-    if(!res.ok) throw new Error('Falha ao listar arquivos');
-    const data = await res.json();
-    const arquivos = (data.files||[]).sort((a,b)=>{
-      const pa = driveEhPasta(a.mimeType) ? 0 : 1, pb = driveEhPasta(b.mimeType) ? 0 : 1;
-      return pa!==pb ? pa-pb : a.name.localeCompare(b.name);
-    });
-    if(!arquivos.length){
-      filesBody.innerHTML = `<tr><td colspan="4" style="color:var(--muted);">Pasta vazia.</td></tr>`;
-      return;
-    }
-    filesBody.innerHTML = arquivos.map(f=>{
-      const pasta = driveEhPasta(f.mimeType);
-      const icone = pasta ? '📁' : driveIconePorTipo(f.mimeType);
-      return `<tr>
-        <td>
-          <div class="drive-file-name">
-            <div class="drive-file-icon ${pasta?'folder':''}">${icone}</div>
-            <span class="drive-file-row-name" data-id="${f.id}" data-name="${escapeHtml(f.name)}" data-pasta="${pasta?'1':'0'}">${escapeHtml(f.name)}</span>
-          </div>
-        </td>
-        <td style="color:var(--muted);font-size:12.5px;">${f.modifiedTime ? fmtDate(f.modifiedTime.slice(0,10)) : '—'}</td>
-        <td style="color:var(--muted);font-size:12.5px;">${pasta ? '—' : driveFormatarTamanho(f.size)}</td>
-        <td class="row-actions">
-          ${pasta ? '' : `<button class="icon-btn" title="Baixar" data-baixar="${f.id}" data-nome="${escapeHtml(f.name)}" data-mime="${escapeHtml(f.mimeType)}">⬇</button>`}
-        </td>
-      </tr>`;
-    }).join('');
-
-    filesBody.querySelectorAll('.drive-file-row-name').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        if(el.dataset.pasta==='1'){
-          driveStack.push({id: el.dataset.id, name: el.dataset.name});
-          driveCarregarPasta(el.dataset.id);
-        }
-      });
-    });
-    filesBody.querySelectorAll('[data-baixar]').forEach(btn=>{
-      btn.addEventListener('click', ()=> driveBaixarArquivo(btn.dataset.baixar, btn.dataset.nome, btn.dataset.mime));
-    });
-  }catch(e){
-    filesBody.innerHTML = `<tr><td colspan="4" style="color:var(--danger);">Não foi possível carregar os arquivos. Reconecte a conta e tente novamente.</td></tr>`;
-  }
-}
-
-function driveIconePorTipo(mime){
-  if(!mime) return '📄';
-  if(mime.includes('spreadsheet')) return '📊';
-  if(mime.includes('document')) return '📝';
-  if(mime.includes('presentation')) return '📑';
-  if(mime.includes('pdf')) return '📕';
-  if(mime.includes('image')) return '🖼️';
-  if(mime.includes('zip') || mime.includes('compressed')) return '🗜️';
-  return '📄';
-}
-
-function renderDriveBreadcrumb(){
-  const el = document.getElementById('drive-breadcrumb');
-  if(!el) return;
-  el.innerHTML = driveStack.map((p,i)=>{
-    const isLast = i===driveStack.length-1;
-    return `${i>0?'<span class="sep">/</span>':''}<button data-idx="${i}">${escapeHtml(p.name)}</button>`;
-  }).join('');
-  el.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const idx = Number(btn.dataset.idx);
-      driveStack = driveStack.slice(0, idx+1);
-      driveCarregarPasta(driveStack[driveStack.length-1].id);
-    });
-  });
-}
-
-async function driveBaixarArquivo(fileId, fileName, mimeType){
-  const conta = driveContaAtiva();
-  if(!conta) return;
-  showToast('Preparando download…');
-  try{
-    let url, sufixo = '';
-    const exportMap = {
-      'application/vnd.google-apps.document': ['application/pdf', '.pdf'],
-      'application/vnd.google-apps.spreadsheet': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx'],
-      'application/vnd.google-apps.presentation': ['application/vnd.openxmlformats-officedocument.presentationml.presentation', '.pptx'],
-    };
-    if(exportMap[mimeType]){
-      const [exportMime, ext] = exportMap[mimeType];
-      url = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=${encodeURIComponent(exportMime)}`;
-      sufixo = ext;
-    } else {
-      url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    }
-    const res = await driveApiFetch(url);
-    if(!res.ok) throw new Error('Falha no download');
-    const blob = await res.blob();
-    const nomeFinal = fileName + (sufixo && !fileName.toLowerCase().endsWith(sufixo) ? sufixo : '');
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = nomeFinal;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
-    showToast('Download concluído.');
-  }catch(e){
-    showToast('Não foi possível baixar o arquivo.');
-  }
-}
-
-async function driveEnviarArquivos(fileList){
-  const conta = driveContaAtiva();
-  if(!conta || !fileList || !fileList.length) return;
-  const pastaAtual = driveStack[driveStack.length-1].id;
-  showToast(`Enviando ${fileList.length} arquivo(s)…`);
-  for(const file of fileList){
-    try{
-      const metadata = { name: file.name, parents: pastaAtual!=='root' ? [pastaAtual] : undefined };
-      const boundary = 'drive-upload-' + Date.now() + '-' + Math.random().toString(36).slice(2);
-      const delimiter = `\r\n--${boundary}\r\n`;
-      const closeDelim = `\r\n--${boundary}--`;
-      const fileBuffer = await file.arrayBuffer();
-      const encoder = new TextEncoder();
-      const metaPart = encoder.encode(delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(metadata));
-      const mediaHeader = encoder.encode(delimiter + `Content-Type: ${file.type || 'application/octet-stream'}\r\n\r\n`);
-      const closePart = encoder.encode(closeDelim);
-      const body = new Blob([metaPart, mediaHeader, fileBuffer, closePart]);
-
-      const res = await driveApiFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name', {
-        method: 'POST',
-        headers: { 'Content-Type': `multipart/related; boundary=${boundary}` },
-        body,
-      });
-      if(!res.ok) throw new Error('Falha no envio de '+file.name);
-    }catch(e){
-      showToast(`Não foi possível enviar "${file.name}".`);
-    }
-  }
-  showToast('Envio concluído.');
-  driveCarregarPasta(pastaAtual);
-}
-
-function renderDriveView(){
-  const warning = document.getElementById('drive-config-warning');
-  const empty = document.getElementById('drive-empty-state');
-  const wrap = document.getElementById('drive-browser-wrap');
-  renderDriveAccounts();
-
-  if(!GOOGLE_CLIENT_ID){
-    wrap.style.display = 'none';
-    warning.innerHTML = '';
-    empty.innerHTML = `
-      <div class="drive-empty">
-        <div class="drive-empty-icon">🔌</div>
-        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">O acesso integrado ainda não foi configurado</div>
-        <div style="max-width:520px;margin:0 auto;">Use o botão "Abrir o Google Drive numa aba nova", ali em cima, para acessar seus arquivos agora mesmo, sem nenhuma configuração. Se preferir deixar os arquivos embutidos aqui dentro do sistema, é preciso criar um "OAuth Client ID" gratuito no Google Cloud Console e colar o valor na constante <code>GOOGLE_CLIENT_ID</code>, no topo do arquivo (veja o passo a passo na tela Sistema).</div>
-      </div>`;
-    return;
-  }
-  if(!driveGoogleLibPronta()){
-    wrap.style.display = 'none';
-    empty.innerHTML = `<div class="drive-empty"><div class="drive-empty-icon">⏳</div>Carregando o conector do Google…</div>`;
-    setTimeout(renderDriveView, 700);
-    return;
-  }
-  driveInitClient();
-  warning.innerHTML = '';
-
-  if(!driveActiveEmail){
-    wrap.style.display = 'none';
-    empty.innerHTML = `
-      <div class="drive-empty">
-        <div class="drive-empty-icon">📁</div>
-        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">Nenhuma conta conectada</div>
-        <div>Clique em "Conectar conta Google" acima para acessar os arquivos.</div>
-      </div>`;
-    return;
-  }
-  empty.innerHTML = '';
-  driveCarregarPasta(driveStack.length ? driveStack[driveStack.length-1].id : 'root');
-}
-
-document.getElementById('btn-drive-atualizar').addEventListener('click', ()=>{
-  if(driveActiveEmail) driveCarregarPasta(driveStack[driveStack.length-1].id);
-});
-document.getElementById('btn-drive-upload').addEventListener('click', ()=>{
-  document.getElementById('drive-upload-input').click();
-});
-document.getElementById('drive-upload-input').addEventListener('change', (e)=>{
-  driveEnviarArquivos(e.target.files);
-  e.target.value = '';
-});
-document.getElementById('btn-drive-abrir-simples').addEventListener('click', ()=>{
-  window.open('https://drive.google.com/drive/my-drive', '_blank', 'noopener');
-});
 
 async function initApp(){
   if(!useSupabase()){
