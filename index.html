@@ -1338,12 +1338,27 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         </div>
       </div>
       <div class="card" style="padding:16px 18px;margin-bottom:18px;">
-        <div class="card-label" style="margin-bottom:8px;">Itens padrão do checklist</div>
-        <textarea id="fechamento-itens-padrao" rows="4" style="width:100%;font-size:12.5px;padding:10px;border:1px solid var(--line-strong);border-radius:var(--radius);font-family:var(--font-body);" placeholder="Um item por linha"></textarea>
-        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-          <small style="color:var(--muted);">Usado para montar automaticamente o checklist de cada cliente todo mês.</small>
-          <button class="btn btn-ghost btn-sm" id="btn-salvar-checklist-padrao">Salvar itens padrão</button>
+        <div class="card-label" style="margin-bottom:8px;">Itens padrão do checklist, por regime tributário</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.6;">
+          Já vem pré-preenchido com a rotina real de cada regime (eCAC, Portal do Empreendedor e SIARE/MG). Ajuste como preferir — cada cliente recebe o modelo do seu próprio regime tributário automaticamente todo mês.
         </div>
+        <select class="filter" id="fechamento-regime-select" style="margin-bottom:10px;">
+          <option value="MEI">MEI</option>
+          <option value="SimplesNacional">Simples Nacional (ME/EPP)</option>
+          <option value="LucroPresumidoReal">Lucro Presumido / Lucro Real</option>
+          <option value="generico">Pessoa Física / Autônomo</option>
+        </select>
+        <textarea id="fechamento-itens-padrao" rows="6" style="width:100%;font-size:12.5px;padding:10px;border:1px solid var(--line-strong);border-radius:var(--radius);font-family:var(--font-body);" placeholder="Um item por linha"></textarea>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <small style="color:var(--muted);">Vale a partir dos próximos meses gerados — não altera checklists já criados.</small>
+          <button class="btn btn-ghost btn-sm" id="btn-salvar-checklist-padrao">Salvar este modelo</button>
+        </div>
+      </div>
+      <div class="card" style="padding:14px 18px;margin-bottom:18px;font-size:12px;color:var(--muted);line-height:1.7;">
+        <b style="color:var(--ink);">Portais de referência:</b>
+        eCAC (<span style="font-family:var(--font-mono);">gov.br/receitafederal</span>) — PGDAS-D, DCTFWeb, EFD-Reinf e situação fiscal federal ·
+        Portal do Empreendedor (<span style="font-family:var(--font-mono);">portaldoempreendedor.gov.br</span>) — DAS-MEI, relatório de receitas e alterações cadastrais do MEI ·
+        SIARE/SEF-MG (<span style="font-family:var(--font-mono);">sefaz.mg.gov.br</span>) — DAPI, EFD do ICMS, DeSTDA e demais obrigações estaduais de Minas Gerais.
       </div>
       <div id="fechamento-container"></div>
     </section>
@@ -1586,8 +1601,9 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <div class="field" id="grupo-cnpj">
             <label>CNPJ</label>
             <div style="position:relative;">
-              <input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00">
-              <span id="cnpj-status" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--primary);font-weight:600;">Buscando...</span>
+              <input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00" style="padding-right:74px!important;">
+              <span id="cnpj-status" style="display:none;position:absolute;right:74px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--primary);font-weight:600;">Buscando...</span>
+              <button type="button" id="btn-buscar-cnpj" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--primary);font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 7px;border-radius:6px;cursor:pointer;" title="Buscar dados deste CNPJ agora">🔄 Buscar</button>
             </div>
             <small id="cnpj-hint">Preenchido automaticamente ao digitar o CNPJ</small>
           </div>
@@ -2014,9 +2030,11 @@ function attachDocMask(el, maskFn){
 attachDocMask(document.getElementById('f-cliente-cpf'), maskCPF);
 attachDocMask(document.getElementById('f-cliente-cnpj'), maskCNPJ);
 
-/* Busca automática de dados da empresa ao digitar um CNPJ completo (14 dígitos),
-   usando a BrasilAPI (gratuita, sem necessidade de chave). Só preenche campos
-   que ainda estão vazios, para nunca sobrescrever algo que a pessoa já digitou. */
+/* Busca automática de dados da empresa ao digitar um CNPJ completo (14
+   dígitos), usando a BrasilAPI (gratuita, sem necessidade de chave).
+   Sempre preenche com o que a Receita Federal retornar (é uma ação
+   explícita da pessoa ao completar o CNPJ) — mas nunca apaga um campo
+   caso a Receita não tenha aquela informação cadastrada. */
 let cnpjLookupTimeout = null;
 document.getElementById('f-cliente-cnpj').addEventListener('input', ()=>{
   clearTimeout(cnpjLookupTimeout);
@@ -2028,34 +2046,63 @@ document.getElementById('f-cliente-cnpj').addEventListener('input', ()=>{
   }
   cnpjLookupTimeout = setTimeout(()=> buscarDadosCnpj(digits), 500);
 });
+document.getElementById('btn-buscar-cnpj').addEventListener('click', ()=>{
+  const digits = (document.getElementById('f-cliente-cnpj').value||'').replace(/\D/g,'');
+  if(digits.length !== 14){ showToast('Digite um CNPJ completo (14 dígitos) antes de buscar.'); return; }
+  buscarDadosCnpj(digits);
+});
+function formatarTelefoneBR(v){
+  const d = (v||'').replace(/\D/g,'');
+  if(d.length===11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  if(d.length===10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return v||'';
+}
 async function buscarDadosCnpj(digits){
   const statusEl = document.getElementById('cnpj-status');
   const hintEl = document.getElementById('cnpj-hint');
-  const preencheSeVazio = (id, valor)=>{
-    if(!valor) return;
+  const preenche = (id, valor)=>{
+    if(valor===undefined || valor===null || valor==='') return;
     const campo = document.getElementById(id);
-    if(campo && !campo.value.trim()) campo.value = valor;
+    if(campo) campo.value = valor;
   };
   if(statusEl) statusEl.style.display = 'inline';
   if(hintEl){ hintEl.textContent = 'Consultando dados da empresa...'; hintEl.style.color = 'var(--muted)'; }
   try{
     const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
-    if(!res.ok) throw new Error('CNPJ não encontrado');
+    if(!res.ok){
+      const corpo = await res.text().catch(()=>'') ;
+      throw new Error(`HTTP ${res.status} ${corpo}`.slice(0,200));
+    }
     const d = await res.json();
-    preencheSeVazio('f-cliente-nome', d.razao_social);
-    preencheSeVazio('f-cliente-nomeempresa', d.nome_fantasia);
-    preencheSeVazio('f-cliente-logradouro', d.logradouro);
-    preencheSeVazio('f-cliente-numero', d.numero);
-    preencheSeVazio('f-cliente-bairro', d.bairro);
-    preencheSeVazio('f-cliente-cidade', d.municipio);
-    preencheSeVazio('f-cliente-uf', d.uf);
-    preencheSeVazio('f-cliente-email', d.email);
-    if(d.ddd_telefone_1) preencheSeVazio('f-cliente-tel', d.ddd_telefone_1);
-    if(d.data_inicio_atividade) preencheSeVazio('f-cliente-abertura', d.data_inicio_atividade);
-    if(hintEl){ hintEl.textContent = '✅ Dados preenchidos automaticamente pela Receita Federal.'; hintEl.style.color = 'var(--primary)'; }
+    preenche('f-cliente-nome', d.razao_social);
+    preenche('f-cliente-nomeempresa', d.nome_fantasia);
+    preenche('f-cliente-logradouro', d.logradouro);
+    preenche('f-cliente-numero', d.numero);
+    preenche('f-cliente-bairro', d.bairro);
+    preenche('f-cliente-cidade', d.municipio);
+    preenche('f-cliente-uf', d.uf);
+    preenche('f-cliente-email', d.email);
+    preenche('f-cliente-tel', formatarTelefoneBR(d.ddd_telefone_1));
+    preenche('f-cliente-abertura', d.data_inicio_atividade);
+
+    const camposVazios = [];
+    if(!d.nome_fantasia) camposVazios.push('nome fantasia');
+    if(!d.email) camposVazios.push('e-mail');
+    if(!d.ddd_telefone_1) camposVazios.push('telefone');
+    if(camposVazios.length){
+      if(hintEl){
+        hintEl.textContent = `✅ Endereço e razão social preenchidos. A Receita Federal não tem ${camposVazios.join(', ')} cadastrado(s) para esta empresa — preencha manualmente, se souber.`;
+        hintEl.style.color = 'var(--primary)';
+      }
+    } else if(hintEl){
+      hintEl.textContent = '✅ Dados preenchidos automaticamente pela Receita Federal.';
+      hintEl.style.color = 'var(--primary)';
+    }
     showToast('Dados da empresa preenchidos automaticamente.');
   }catch(e){
-    if(hintEl){ hintEl.textContent = 'Não foi possível localizar este CNPJ — preencha manualmente.'; hintEl.style.color = 'var(--muted)'; }
+    console.error('Busca de CNPJ falhou:', e);
+    if(hintEl){ hintEl.textContent = 'Não foi possível localizar este CNPJ agora — preencha manualmente ou tente novamente em instantes.'; hintEl.style.color = 'var(--muted)'; }
+    showToast('Não foi possível consultar este CNPJ agora.');
   }finally{
     if(statusEl) statusEl.style.display = 'none';
   }
@@ -2205,8 +2252,17 @@ function normalizeData(parsed){
 }
 
 /* Cria (uma vez por cliente/mês) o checklist de fechamento do mês vigente,
-   com os itens padrão definidos em Sistema → Fechamento mensal. Clientes do
-   tipo Avulso não recebem checklist recorrente. */
+   com os itens padrão do REGIME TRIBUTÁRIO do cliente (MEI, Simples
+   Nacional, Lucro Presumido/Real) ou do modelo genérico (PF/Autônomo),
+   configuráveis em Sistema → Fechamento mensal. Clientes do tipo Avulso
+   não recebem checklist recorrente. */
+function chaveRegimeChecklist(client){
+  if(client.tipoEmpresa !== 'PJ') return 'generico';
+  const regime = client.regimeTributario || 'Simples Nacional';
+  if(regime === 'MEI') return 'MEI';
+  if(regime === 'Simples Nacional') return 'SimplesNacional';
+  return 'LucroPresumidoReal'; // Lucro Presumido e Lucro Real compartilham o mesmo roteiro-base
+}
 function gerarChecklistMesAtual(d, client){
   if(!client) return;
   if((client.tipoCliente || 'Mensal') !== 'Mensal') return;
@@ -2214,12 +2270,48 @@ function gerarChecklistMesAtual(d, client){
   const competencia = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
   const jaExiste = d.checklists.some(cl => cl.clientId===client.id && cl.competencia===competencia);
   if(jaExiste) return;
-  const itensPadrao = (d.settings && d.settings.checklistItensPadrao) || CHECKLIST_ITENS_PADRAO_INICIAL;
+  const chave = chaveRegimeChecklist(client);
+  const mapa = (d.settings && d.settings.checklistItensPorRegime) || {};
+  const itensPadrao = mapa[chave] || CHECKLIST_ITENS_PADRAO_INICIAL[chave];
   const itens = itensPadrao.split('\n').map(t=>t.trim()).filter(Boolean).map(texto=>({ id: uid(), texto, feito: false }));
   if(!itens.length) return;
-  d.checklists.push({ id: uid(), clientId: client.id, competencia, itens });
+  d.checklists.push({ id: uid(), clientId: client.id, competencia, itens, regime: chave });
 }
-const CHECKLIST_ITENS_PADRAO_INICIAL = 'Notas fiscais recebidas\nFolha de pagamento calculada\nGuias e impostos emitidos\nObrigações acessórias enviadas (DCTFWeb, eSocial, SPED etc.)\nCliente comunicado sobre pendências';
+/* Modelos iniciais, já pré-preenchidos com as rotinas reais de cada regime
+   (eCAC, Portal do Empreendedor e SIARE/MG), prontos para ajustar em
+   Sistema → Fechamento mensal conforme a rotina do seu escritório. */
+const CHECKLIST_ITENS_PADRAO_INICIAL = {
+  MEI:
+    'Relatório Mensal de Receitas Brutas preenchido (modelo do Portal do Empreendedor)\n'+
+    'Guia DAS-MEI paga — vence dia 20\n'+
+    'Notas fiscais do mês emitidas e arquivadas\n'+
+    'Portal do Empreendedor consultado (pendências e comunicados)',
+  SimplesNacional:
+    'PGDAS-D transmitido (Simples Nacional, via eCAC) — até dia 20\n'+
+    'Guia DAS paga — até dia 20\n'+
+    'eSocial da folha de pagamento fechado — até dia 15 (se houver empregados)\n'+
+    'DCTFWeb conferida no eCAC\n'+
+    'EFD-Reinf enviada, se houver retenções — até dia 15\n'+
+    'Obrigação estadual verificada no SIARE (DAPI/EFD do ICMS ou DeSTDA, conforme enquadramento)\n'+
+    'Notas fiscais e documentos do mês conferidos',
+  LucroPresumidoReal:
+    'DCTFWeb conferida no eCAC\n'+
+    'EFD-Contribuições apurada\n'+
+    'eSocial e EFD-Reinf da folha enviados, se houver empregados\n'+
+    'Obrigação estadual verificada no SIARE (DAPI/EFD do ICMS)\n'+
+    'Apuração de IRPJ e CSLL do período\n'+
+    'Notas fiscais e documentos do mês conferidos',
+  generico:
+    'Notas fiscais e recibos do mês conferidos\n'+
+    'Guias e impostos pessoais em dia\n'+
+    'Cliente comunicado sobre pendências',
+};
+const CHECKLIST_REGIME_LABELS = {
+  MEI: 'MEI',
+  SimplesNacional: 'Simples Nacional (ME/EPP)',
+  LucroPresumidoReal: 'Lucro Presumido / Lucro Real',
+  generico: 'Pessoa Física / Autônomo',
+};
 
 const MESES_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 function competenciaLabel(comp){
@@ -3355,10 +3447,9 @@ function renderFaixasAtraso(){
 /* ================= FECHAMENTO MENSAL (checklist/obrigações) ================= */
 function renderFechamento(){
   const select = document.getElementById('fechamento-competencia-select');
-  const textarea = document.getElementById('fechamento-itens-padrao');
   if(!select) return;
 
-  textarea.value = (DATA.settings && DATA.settings.checklistItensPadrao) || CHECKLIST_ITENS_PADRAO_INICIAL;
+  carregarTextareaRegimeChecklist();
 
   const hoje = new Date();
   const competenciaAtual = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
@@ -3395,6 +3486,7 @@ function renderFechamentoLista(competencia){
       <div class="fechamento-card-head" onclick="toggleFechamentoCard('${cl.id}')">
         <div>
           <strong>${escapeHtml(client.nome)}</strong>
+          <span class="role-badge colaborador" style="margin-left:8px;">${escapeHtml(CHECKLIST_REGIME_LABELS[cl.regime] || 'Genérico')}</span>
           <div class="fechamento-progress-track"><div class="fechamento-progress-fill ${completo?'completo':''}" style="width:${pct}%;"></div></div>
         </div>
         <span class="fechamento-count ${completo?'completo':''}">${completo?'✅ ':''}${feitos}/${total}</span>
@@ -3423,11 +3515,24 @@ function toggleChecklistItem(checklistId, itemId, valor){
   renderFechamentoLista(document.getElementById('fechamento-competencia-select').value);
 }
 document.getElementById('fechamento-competencia-select').addEventListener('change', (e)=> renderFechamentoLista(e.target.value));
+
+/* Modelo de checklist por regime tributário (seletor + textarea) */
+function carregarTextareaRegimeChecklist(){
+  const regimeSelect = document.getElementById('fechamento-regime-select');
+  const textarea = document.getElementById('fechamento-itens-padrao');
+  if(!regimeSelect || !textarea) return;
+  const chave = regimeSelect.value || 'MEI';
+  const mapa = (DATA.settings && DATA.settings.checklistItensPorRegime) || {};
+  textarea.value = mapa[chave] || CHECKLIST_ITENS_PADRAO_INICIAL[chave];
+}
+document.getElementById('fechamento-regime-select').addEventListener('change', carregarTextareaRegimeChecklist);
 document.getElementById('btn-salvar-checklist-padrao').addEventListener('click', ()=>{
+  const chave = document.getElementById('fechamento-regime-select').value;
   const texto = document.getElementById('fechamento-itens-padrao').value;
-  DATA.settings.checklistItensPadrao = texto;
+  if(!DATA.settings.checklistItensPorRegime) DATA.settings.checklistItensPorRegime = {};
+  DATA.settings.checklistItensPorRegime[chave] = texto;
   saveData();
-  showToast('Itens padrão salvos. Serão usados a partir do próximo mês gerado.');
+  showToast(`Modelo de "${CHECKLIST_REGIME_LABELS[chave]}" salvo. Vale a partir do próximo mês gerado.`);
 });
 
 function renderChartRecebimentos(containerId){
