@@ -80,6 +80,30 @@
 .gs-icon{flex:0 0 auto;}
 .gs-sub{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
 .global-search-empty{padding:16px;color:var(--muted);font-size:12.5px;text-align:center;}
+
+.fechamento-card{padding:14px 16px;margin-bottom:10px;}
+.fechamento-card-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:14px;}
+.fechamento-progress-track{width:160px;height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:6px;}
+.fechamento-progress-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .2s ease;}
+.fechamento-progress-fill.completo{background:var(--accent);}
+.fechamento-count{font-family:var(--font-mono);font-size:13px;color:var(--muted);white-space:nowrap;}
+.fechamento-count.completo{color:var(--primary);font-weight:700;}
+.fechamento-itens{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px;}
+.fechamento-item-label{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink);cursor:pointer;}
+.fechamento-item-label input{width:16px;height:16px;flex:0 0 auto;accent-color:var(--primary);}
+.fechamento-item-label.feito span{color:var(--muted);text-decoration:line-through;}
+
+/* Restrições visuais para o papel "Colaborador" (a proteção real acontece
+   também dentro das próprias funções de exclusão, em JavaScript). */
+body.role-colaborador .nav-btn[data-view="sistema"]{display:none;}
+body.role-colaborador .btn-excluir-registro{display:none;}
+body.role-colaborador .only-admin{display:none;}
+.role-badge{
+  display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
+  padding:2px 8px;border-radius:10px;margin-left:6px;vertical-align:middle;
+}
+.role-badge.admin{background:var(--primary-wash);color:var(--primary);}
+.role-badge.colaborador{background:var(--accent-wash);color:var(--accent);}
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -951,6 +975,10 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
         Serviços
       </button>
+      <button class="nav-btn" data-view="fechamento">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Fechamento
+      </button>
       <button class="nav-btn" data-view="pagamentos">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Financeiro
@@ -1298,6 +1326,28 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
       <div id="servicos-container"></div>
     </section>
 
+    <!-- FECHAMENTO MENSAL (obrigações e checklist) -->
+    <section class="view" id="view-fechamento">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Fechamento mensal</h1>
+          <div class="view-desc">Checklist de obrigações e tarefas de cada cliente, mês a mês</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select class="filter" id="fechamento-competencia-select"></select>
+        </div>
+      </div>
+      <div class="card" style="padding:16px 18px;margin-bottom:18px;">
+        <div class="card-label" style="margin-bottom:8px;">Itens padrão do checklist</div>
+        <textarea id="fechamento-itens-padrao" rows="4" style="width:100%;font-size:12.5px;padding:10px;border:1px solid var(--line-strong);border-radius:var(--radius);font-family:var(--font-body);" placeholder="Um item por linha"></textarea>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <small style="color:var(--muted);">Usado para montar automaticamente o checklist de cada cliente todo mês.</small>
+          <button class="btn btn-ghost btn-sm" id="btn-salvar-checklist-padrao">Salvar itens padrão</button>
+        </div>
+      </div>
+      <div id="fechamento-container"></div>
+    </section>
+
     <!-- PAGAMENTOS -->
     <section class="view" id="view-pagamentos">
       <div class="view-header">
@@ -1421,6 +1471,21 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           </div>
         </div>
 
+        <div class="card only-admin" style="padding:22px 24px;">
+          <div class="card-label" style="margin-bottom:8px;">Equipe e permissões</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+            Quem faz login vira automaticamente "Colaborador" (acesso operacional, sem excluir registros nem ver esta tela). A <b>primeira pessoa</b> a logar após esta atualização vira Administradora automaticamente. Só administradores podem promover ou rebaixar outras pessoas aqui.
+          </div>
+          <div id="equipe-permissoes-container"></div>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.5;">⚠️ Esta é uma restrição de interface (esconde e desabilita ações para colaboradores). Ela não substitui, por si só, uma política de segurança de banco de dados por campo — para esse nível de proteção, todo o acesso à tabela já exige login (ver "Login com e-mail e senha" acima).</div>
+        </div>
+
+        <div class="card only-admin" style="padding:22px 24px;">
+          <div class="card-label" style="margin-bottom:8px;">Atividades recentes</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Registro de exclusões e outras ações importantes feitas por qualquer pessoa da equipe.</div>
+          <div id="log-atividades-container"></div>
+        </div>
+
         <div class="card" style="padding:22px 24px;">
           <div class="card-label" style="margin-bottom:8px;">Dados de recebimento (PIX)</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Usados para montar a mensagem de cobrança enviada por WhatsApp aos clientes.</div>
@@ -1520,8 +1585,11 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           </div>
           <div class="field" id="grupo-cnpj">
             <label>CNPJ</label>
-            <input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00">
-            <small>Documento da empresa</small>
+            <div style="position:relative;">
+              <input type="text" id="f-cliente-cnpj" placeholder="00.000.000/0000-00">
+              <span id="cnpj-status" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--primary);font-weight:600;">Buscando...</span>
+            </div>
+            <small id="cnpj-hint">Preenchido automaticamente ao digitar o CNPJ</small>
           </div>
         </div>
       </div>
@@ -1554,6 +1622,10 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <div class="field"><label>Nº</label><input type="text" id="f-cliente-numero" placeholder="Nº"></div>
           <div class="field"><label>Bairro</label><input type="text" id="f-cliente-bairro"></div>
           <div class="field"><label>Cidade</label><input type="text" id="f-cliente-cidade"></div>
+        </div>
+        <div class="field" style="max-width:110px;">
+          <label>UF</label>
+          <input type="text" id="f-cliente-uf" placeholder="UF" maxlength="2" style="text-transform:uppercase;">
         </div>
       </div>
 
@@ -1942,6 +2014,53 @@ function attachDocMask(el, maskFn){
 attachDocMask(document.getElementById('f-cliente-cpf'), maskCPF);
 attachDocMask(document.getElementById('f-cliente-cnpj'), maskCNPJ);
 
+/* Busca automática de dados da empresa ao digitar um CNPJ completo (14 dígitos),
+   usando a BrasilAPI (gratuita, sem necessidade de chave). Só preenche campos
+   que ainda estão vazios, para nunca sobrescrever algo que a pessoa já digitou. */
+let cnpjLookupTimeout = null;
+document.getElementById('f-cliente-cnpj').addEventListener('input', ()=>{
+  clearTimeout(cnpjLookupTimeout);
+  const digits = (document.getElementById('f-cliente-cnpj').value||'').replace(/\D/g,'');
+  const hintEl = document.getElementById('cnpj-hint');
+  if(digits.length !== 14){
+    if(hintEl) hintEl.textContent = 'Preenchido automaticamente ao digitar o CNPJ';
+    return;
+  }
+  cnpjLookupTimeout = setTimeout(()=> buscarDadosCnpj(digits), 500);
+});
+async function buscarDadosCnpj(digits){
+  const statusEl = document.getElementById('cnpj-status');
+  const hintEl = document.getElementById('cnpj-hint');
+  const preencheSeVazio = (id, valor)=>{
+    if(!valor) return;
+    const campo = document.getElementById(id);
+    if(campo && !campo.value.trim()) campo.value = valor;
+  };
+  if(statusEl) statusEl.style.display = 'inline';
+  if(hintEl){ hintEl.textContent = 'Consultando dados da empresa...'; hintEl.style.color = 'var(--muted)'; }
+  try{
+    const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
+    if(!res.ok) throw new Error('CNPJ não encontrado');
+    const d = await res.json();
+    preencheSeVazio('f-cliente-nome', d.razao_social);
+    preencheSeVazio('f-cliente-nomeempresa', d.nome_fantasia);
+    preencheSeVazio('f-cliente-logradouro', d.logradouro);
+    preencheSeVazio('f-cliente-numero', d.numero);
+    preencheSeVazio('f-cliente-bairro', d.bairro);
+    preencheSeVazio('f-cliente-cidade', d.municipio);
+    preencheSeVazio('f-cliente-uf', d.uf);
+    preencheSeVazio('f-cliente-email', d.email);
+    if(d.ddd_telefone_1) preencheSeVazio('f-cliente-tel', d.ddd_telefone_1);
+    if(d.data_inicio_atividade) preencheSeVazio('f-cliente-abertura', d.data_inicio_atividade);
+    if(hintEl){ hintEl.textContent = '✅ Dados preenchidos automaticamente pela Receita Federal.'; hintEl.style.color = 'var(--primary)'; }
+    showToast('Dados da empresa preenchidos automaticamente.');
+  }catch(e){
+    if(hintEl){ hintEl.textContent = 'Não foi possível localizar este CNPJ — preencha manualmente.'; hintEl.style.color = 'var(--muted)'; }
+  }finally{
+    if(statusEl) statusEl.style.display = 'none';
+  }
+}
+
 function fmtDate(d){
   if(!d) return '—';
   const parts = d.split('-');
@@ -2038,7 +2157,7 @@ function iniciarSincronizacaoTempoReal(){
 function normalizeData(parsed){
   const d = Object.assign({
     clients: [], collections: [], services: [], payments: [],
-    charges: [], settings: {}, nextClientCode: 1, agenda: []
+    charges: [], settings: {}, nextClientCode: 1, agenda: [], checklists: []
   }, parsed || {});
 
   if(!Array.isArray(d.clients)) d.clients = [];
@@ -2047,6 +2166,7 @@ function normalizeData(parsed){
   if(!Array.isArray(d.payments)) d.payments = [];
   if(!Array.isArray(d.agenda)) d.agenda = [];
   if(!Array.isArray(d.charges)) d.charges = [];
+  if(!Array.isArray(d.checklists)) d.checklists = [];
   if(!d.settings || typeof d.settings !== 'object') d.settings = {};
   if(!d.nextClientCode) d.nextClientCode = 1;
 
@@ -2077,8 +2197,29 @@ function normalizeData(parsed){
   // abertura da empresa, cobrindo somente os meses já decorridos do ano vigente
   d.clients.forEach(c => gerarHonorariosMensaisCliente(d, c));
 
+  // garante o checklist de fechamento/obrigações do mês vigente para cada
+  // cliente mensal (não gera para meses passados nem futuros)
+  d.clients.forEach(c => gerarChecklistMesAtual(d, c));
+
   return d;
 }
+
+/* Cria (uma vez por cliente/mês) o checklist de fechamento do mês vigente,
+   com os itens padrão definidos em Sistema → Fechamento mensal. Clientes do
+   tipo Avulso não recebem checklist recorrente. */
+function gerarChecklistMesAtual(d, client){
+  if(!client) return;
+  if((client.tipoCliente || 'Mensal') !== 'Mensal') return;
+  const hoje = new Date();
+  const competencia = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+  const jaExiste = d.checklists.some(cl => cl.clientId===client.id && cl.competencia===competencia);
+  if(jaExiste) return;
+  const itensPadrao = (d.settings && d.settings.checklistItensPadrao) || CHECKLIST_ITENS_PADRAO_INICIAL;
+  const itens = itensPadrao.split('\n').map(t=>t.trim()).filter(Boolean).map(texto=>({ id: uid(), texto, feito: false }));
+  if(!itens.length) return;
+  d.checklists.push({ id: uid(), clientId: client.id, competencia, itens });
+}
+const CHECKLIST_ITENS_PADRAO_INICIAL = 'Notas fiscais recebidas\nFolha de pagamento calculada\nGuias e impostos emitidos\nObrigações acessórias enviadas (DCTFWeb, eSocial, SPED etc.)\nCliente comunicado sobre pendências';
 
 const MESES_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 function competenciaLabel(comp){
@@ -2182,6 +2323,7 @@ function switchView(view){
   document.getElementById('view-'+view).classList.add('active');
   if(view!=='ficha') renderAll();
   if(view==='sistema') renderSistemaSettings();
+  if(view==='fechamento') renderFechamento();
 }
 
 /* ================= MODAL HELPERS ================= */
@@ -2718,7 +2860,7 @@ function renderClientes(){
           <button class="icon-btn" title="Ver ficha" onclick="abrirFicha('${c.id}')">📄</button>
           <button class="icon-btn" title="Enviar mensagem via WhatsApp" onclick="abrirMensagemWhatsapp('${c.id}')">💬</button>
           <button class="icon-btn" title="Editar" onclick="editarCliente('${c.id}')">✎</button>
-          <button class="icon-btn danger" title="Excluir" onclick="excluirCliente('${c.id}')">🗑</button>
+          <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirCliente('${c.id}')">🗑</button>
         </div>
       </td>
     </tr>`;
@@ -2787,6 +2929,7 @@ function openClienteModal(client){
   document.getElementById('f-cliente-numero').value = client ? (client.numero||'') : '';
   document.getElementById('f-cliente-bairro').value = client ? (client.bairro||'') : '';
   document.getElementById('f-cliente-cidade').value = client ? (client.cidade||'') : '';
+  document.getElementById('f-cliente-uf').value = client ? (client.uf||'') : '';
   document.getElementById('f-cliente-codacesso').value = client ? (client.codigoAcesso||'') : '';
   document.getElementById('f-cliente-senhagov').value = client ? (client.senhaGov||'') : '';
   document.getElementById('f-cliente-obs').value = client ? client.obs : '';
@@ -2799,6 +2942,7 @@ function editarCliente(id){
   if(c) openClienteModal(c);
 }
 function excluirCliente(id){
+  if(!podeExcluir()) return;
   const c = DATA.clients.find(x=>x.id===id);
   if(!c) return;
   askConfirm(
@@ -2811,6 +2955,7 @@ function excluirCliente(id){
       DATA.charges = DATA.charges.filter(x=>x.clientId!==id);
       saveData(); renderAll();
       showToast('Cliente excluído.');
+      registrarLogAtividade('Cliente excluído', c.nome);
     },
     c.nome
   );
@@ -2839,11 +2984,13 @@ document.getElementById('salvar-cliente').addEventListener('click', ()=>{
     numero: document.getElementById('f-cliente-numero').value.trim(),
     bairro: document.getElementById('f-cliente-bairro').value.trim(),
     cidade: document.getElementById('f-cliente-cidade').value.trim(),
+    uf: document.getElementById('f-cliente-uf').value.trim().toUpperCase(),
     endereco: [
       document.getElementById('f-cliente-logradouro').value.trim(),
       document.getElementById('f-cliente-numero').value.trim() ? 'Nº '+document.getElementById('f-cliente-numero').value.trim() : '',
       document.getElementById('f-cliente-bairro').value.trim(),
-      document.getElementById('f-cliente-cidade').value.trim()
+      document.getElementById('f-cliente-cidade').value.trim(),
+      document.getElementById('f-cliente-uf').value.trim().toUpperCase()
     ].filter(Boolean).join(', '),
     codigoAcesso: document.getElementById('f-cliente-codacesso').value.trim(),
     senhaGov: document.getElementById('f-cliente-senhagov').value.trim(),
@@ -2862,6 +3009,7 @@ document.getElementById('salvar-cliente').addEventListener('click', ()=>{
   const geradas = DATA.charges.length - honorariosAntes;
   saveData(); closeOverlay('overlay-cliente'); renderAll();
   showToast(geradas>0 ? `Cliente salvo. ${geradas} cobrança(s) de honorário mensal gerada(s) em Financeiro.` : 'Cliente salvo.');
+  registrarLogAtividade(editingClientId ? 'Cliente editado' : 'Cliente cadastrado', clienteSalvo.nome);
 });
 document.getElementById('busca-cliente').addEventListener('input', renderClientes);
 document.getElementById('filtro-clientes-tipo').addEventListener('change', renderClientes);
@@ -2889,7 +3037,7 @@ function renderColetas(){
     <td>
       <div class="row-actions">
         <button class="icon-btn" title="Editar" onclick="editarColeta('${c.id}')">✎</button>
-        <button class="icon-btn danger" title="Excluir" onclick="excluirColeta('${c.id}')">🗑</button>
+        <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirColeta('${c.id}')">🗑</button>
       </div>
     </td>
   </tr>`).join('');
@@ -2912,9 +3060,11 @@ function openColetaModal(item){
 }
 function editarColeta(id){ const c = DATA.collections.find(c=>c.id===id); if(c) openColetaModal(c); }
 function excluirColeta(id){
+  if(!podeExcluir()) return;
   askConfirm('Deseja excluir esta coleta?', ()=>{
     DATA.collections = DATA.collections.filter(c=>c.id!==id);
     saveData(); renderAll(); showToast('Coleta excluída.');
+    registrarLogAtividade('Coleta excluída', id);
   });
 }
 document.getElementById('salvar-coleta').addEventListener('click', ()=>{
@@ -2965,7 +3115,7 @@ function renderServicos(){
       <div class="row-actions">
         <button class="icon-btn" title="Autorização em PDF" onclick="imprimirAutorizacaoServico('${s.id}')">📝</button>
         <button class="icon-btn" title="Editar" onclick="editarServico('${s.id}')">✎</button>
-        <button class="icon-btn danger" title="Excluir" onclick="excluirServico('${s.id}')">🗑</button>
+        <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirServico('${s.id}')">🗑</button>
       </div>
     </td>
   </tr>`;
@@ -3022,6 +3172,7 @@ function openServicoModal(item){
 }
 function editarServico(id){ const s = DATA.services.find(s=>s.id===id); if(s) openServicoModal(s); }
 function excluirServico(id){
+  if(!podeExcluir()) return;
   askConfirm('Deseja excluir este serviço? A cobrança vinculada em Pagamentos também será removida (os pagamentos já recebidos são mantidos como avulsos).', ()=>{
     const charge = DATA.charges.find(ch=>ch.serviceId===id);
     if(charge){
@@ -3030,6 +3181,7 @@ function excluirServico(id){
     }
     DATA.services = DATA.services.filter(s=>s.id!==id);
     saveData(); renderAll(); showToast('Serviço excluído.');
+    registrarLogAtividade('Serviço excluído', id);
   });
 }
 document.getElementById('salvar-servico').addEventListener('click', ()=>{
@@ -3199,6 +3351,84 @@ function renderFaixasAtraso(){
     </div>`;
   }).join('')}</div>`;
 }
+
+/* ================= FECHAMENTO MENSAL (checklist/obrigações) ================= */
+function renderFechamento(){
+  const select = document.getElementById('fechamento-competencia-select');
+  const textarea = document.getElementById('fechamento-itens-padrao');
+  if(!select) return;
+
+  textarea.value = (DATA.settings && DATA.settings.checklistItensPadrao) || CHECKLIST_ITENS_PADRAO_INICIAL;
+
+  const hoje = new Date();
+  const competenciaAtual = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`;
+  const competencias = Array.from(new Set(DATA.checklists.map(cl=>cl.competencia)));
+  if(!competencias.includes(competenciaAtual)) competencias.push(competenciaAtual);
+  competencias.sort().reverse();
+
+  const selecionadaAnterior = select.value;
+  select.innerHTML = competencias.map(c=>`<option value="${c}">${competenciaLabel(c)}</option>`).join('');
+  select.value = competencias.includes(selecionadaAnterior) ? selecionadaAnterior : competenciaAtual;
+
+  renderFechamentoLista(select.value);
+}
+function renderFechamentoLista(competencia){
+  const container = document.getElementById('fechamento-container');
+  if(!container) return;
+  const lista = DATA.checklists
+    .filter(cl=>cl.competencia===competencia)
+    .map(cl=>({ cl, client: DATA.clients.find(c=>c.id===cl.clientId) }))
+    .filter(x=>x.client)
+    .sort((a,b)=>a.client.nome.localeCompare(b.client.nome));
+
+  if(!lista.length){
+    container.innerHTML = `<div class="empty" style="padding:40px 20px;"><p>Nenhum checklist para este mês ainda.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = lista.map(({cl, client})=>{
+    const total = cl.itens.length;
+    const feitos = cl.itens.filter(it=>it.feito).length;
+    const completo = total>0 && feitos===total;
+    const pct = total ? Math.round((feitos/total)*100) : 0;
+    return `<div class="card fechamento-card">
+      <div class="fechamento-card-head" onclick="toggleFechamentoCard('${cl.id}')">
+        <div>
+          <strong>${escapeHtml(client.nome)}</strong>
+          <div class="fechamento-progress-track"><div class="fechamento-progress-fill ${completo?'completo':''}" style="width:${pct}%;"></div></div>
+        </div>
+        <span class="fechamento-count ${completo?'completo':''}">${completo?'✅ ':''}${feitos}/${total}</span>
+      </div>
+      <div class="fechamento-itens" id="fechamento-itens-${cl.id}" style="display:none;">
+        ${cl.itens.map(it=>`
+          <label class="fechamento-item-label ${it.feito?'feito':''}">
+            <input type="checkbox" ${it.feito?'checked':''} onclick="event.stopPropagation();" onchange="toggleChecklistItem('${cl.id}','${it.id}', this.checked)">
+            <span>${escapeHtml(it.texto)}</span>
+          </label>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function toggleFechamentoCard(checklistId){
+  const el = document.getElementById('fechamento-itens-'+checklistId);
+  if(el) el.style.display = el.style.display==='none' ? 'flex' : 'none';
+}
+function toggleChecklistItem(checklistId, itemId, valor){
+  const cl = DATA.checklists.find(x=>x.id===checklistId);
+  if(!cl) return;
+  const item = cl.itens.find(i=>i.id===itemId);
+  if(!item) return;
+  item.feito = valor;
+  saveData();
+  renderFechamentoLista(document.getElementById('fechamento-competencia-select').value);
+}
+document.getElementById('fechamento-competencia-select').addEventListener('change', (e)=> renderFechamentoLista(e.target.value));
+document.getElementById('btn-salvar-checklist-padrao').addEventListener('click', ()=>{
+  const texto = document.getElementById('fechamento-itens-padrao').value;
+  DATA.settings.checklistItensPadrao = texto;
+  saveData();
+  showToast('Itens padrão salvos. Serão usados a partir do próximo mês gerado.');
+});
 
 function renderChartRecebimentos(containerId){
   const container = document.getElementById(containerId || 'chart-recebimentos');
@@ -3487,7 +3717,7 @@ function renderPagamentos(){
     <td>
       <div class="row-actions">
         <button class="icon-btn" title="Editar" onclick="editarPagamento('${p.id}')">✎</button>
-        <button class="icon-btn danger" title="Excluir" onclick="excluirPagamento('${p.id}')">🗑</button>
+        <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirPagamento('${p.id}')">🗑</button>
       </div>
     </td>
   </tr>`).join('');
@@ -3585,9 +3815,11 @@ function openPagamentoModal(item){
 }
 function editarPagamento(id){ const p = DATA.payments.find(p=>p.id===id); if(p) openPagamentoModal(p); }
 function excluirPagamento(id){
+  if(!podeExcluir()) return;
   askConfirm('Deseja excluir este lançamento?', ()=>{
     DATA.payments = DATA.payments.filter(p=>p.id!==id);
     saveData(); renderAll(); showToast('Lançamento excluído.');
+    registrarLogAtividade('Pagamento excluído', id);
   });
 }
 document.getElementById('salvar-pagamento').addEventListener('click', ()=>{
@@ -3801,7 +4033,7 @@ function downloadCSV(linhas, nomeArquivo){
 const CLIENTE_CSV_COLUNAS = [
   ['codigo','Código'], ['nome','Nome/Razão Social'], ['tipoEmpresa','Tipo (PF/PJ/AUT)'], ['nomeEmpresa','Nome Fantasia'],
   ['cpf','CPF'], ['cnpj','CNPJ'], ['contato','Contato'], ['contatoAlternativo','Contato Alternativo'], ['email','Email'],
-  ['logradouro','Logradouro'], ['numero','Nº'], ['bairro','Bairro'], ['cidade','Cidade'], ['endereco','Endereço'],
+  ['logradouro','Logradouro'], ['numero','Nº'], ['bairro','Bairro'], ['cidade','Cidade'], ['uf','UF'], ['endereco','Endereço'],
   ['tipoCliente','Tipo de Cliente'], ['regimeTributario','Regime Tributário'], ['dataAbertura','Data de Abertura'],
   ['dataAdmissao','Data de Admissão'], ['honorario','Honorário Mensal'], ['status','Status'],
   ['codigoAcesso','Código de Acesso'], ['senhaGov','Senha ECAC'], ['obs','Observações'],
@@ -3858,7 +4090,7 @@ const CLIENTE_CSV_ALIASES = {
   codigo:['codigo'], nome:['nome/razao social','nome','razao social'], tipoEmpresa:['tipo (pf/pj/aut)','tipo (pf/pj)','tipo'],
   nomeEmpresa:['nome fantasia'], cpf:['cpf'], cnpj:['cnpj'], telefone:['telefone','contato'], contato:['contato'],
   contatoAlternativo:['contato alternativo'], email:['email'], logradouro:['logradouro'], numero:['nº','numero'],
-  bairro:['bairro'], cidade:['cidade'], endereco:['endereco'],
+  bairro:['bairro'], cidade:['cidade'], uf:['uf'], endereco:['endereco'],
   tipoCliente:['tipo de cliente'], regimeTributario:['regime tributario'], dataAbertura:['data de abertura'],
   dataAdmissao:['data de admissao'], honorario:['honorario mensal','honorario'], status:['status'],
   codigoAcesso:['codigo de acesso'], senhaGov:['senha gov'], obs:['observacoes'],
@@ -3910,6 +4142,7 @@ function importarClientesCSV(text){
     if(idx.numero!==undefined) payload.numero = (row[idx.numero]||'').trim();
     if(idx.bairro!==undefined) payload.bairro = (row[idx.bairro]||'').trim();
     if(idx.cidade!==undefined) payload.cidade = (row[idx.cidade]||'').trim();
+    if(idx.uf!==undefined) payload.uf = (row[idx.uf]||'').trim().toUpperCase();
     if(idx.contato!==undefined) payload.contato = (row[idx.contato]||'').trim();
     if(idx.contatoAlternativo!==undefined) payload.contatoAlternativo = (row[idx.contatoAlternativo]||'').trim();
     if(!payload.contato && idx.telefone!==undefined) payload.contato = (row[idx.telefone]||'').trim();
@@ -3987,6 +4220,70 @@ function renderSistemaSettings(){
   const label = document.getElementById('storage-backend-label');
   if(label) label.textContent = storageBackendName();
   renderAvisoBackup();
+  if(currentUserRole==='admin' && useSupabase()){
+    renderEquipePermissoes();
+    renderLogAtividades();
+  }
+}
+
+/* ---- Equipe e permissões (somente administradores) ---- */
+async function renderEquipePermissoes(){
+  const container = document.getElementById('equipe-permissoes-container');
+  if(!container) return;
+  container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Carregando...</div>`;
+  try{
+    const { data, error } = await supabaseClient.from('perfis_usuarios').select('user_id,email,role').order('criado_em', { ascending:true });
+    if(error) throw error;
+    if(!data || !data.length){ container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Nenhuma pessoa logou ainda.</div>`; return; }
+    container.innerHTML = data.map(p=>`
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);">
+        <span style="flex:1;font-size:12.5px;color:var(--ink);">${escapeHtml(p.email)}</span>
+        <select class="filter" data-user-id="${p.user_id}" style="font-size:12px;padding:5px 8px;">
+          <option value="colaborador" ${p.role==='colaborador'?'selected':''}>Colaborador</option>
+          <option value="admin" ${p.role==='admin'?'selected':''}>Administrador</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="salvarPapelUsuario('${p.user_id}', this)">Salvar</button>
+      </div>`).join('');
+  }catch(e){
+    container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Não foi possível carregar a equipe.</div>`;
+  }
+}
+async function salvarPapelUsuario(userId, btnEl){
+  const select = document.querySelector(`select[data-user-id="${userId}"]`);
+  if(!select) return;
+  const novoPapel = select.value;
+  btnEl.disabled = true; btnEl.textContent = 'Salvando...';
+  try{
+    const { error } = await supabaseClient.from('perfis_usuarios').update({ role: novoPapel }).eq('user_id', userId);
+    if(error) throw error;
+    showToast('Perfil atualizado.');
+    registrarLogAtividade('Perfil de usuário alterado', `${userId} → ${novoPapel}`);
+  }catch(e){
+    showToast('Não foi possível salvar (só administradores podem alterar perfis).');
+  }
+  btnEl.disabled = false; btnEl.textContent = 'Salvar';
+}
+
+/* ---- Atividades recentes (somente administradores) ---- */
+async function renderLogAtividades(){
+  const container = document.getElementById('log-atividades-container');
+  if(!container) return;
+  container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Carregando...</div>`;
+  try{
+    const { data, error } = await supabaseClient.from('log_atividades').select('usuario_email,acao,detalhe,criado_em').order('criado_em', { ascending:false }).limit(50);
+    if(error) throw error;
+    if(!data || !data.length){ container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Nenhuma atividade registrada ainda.</div>`; return; }
+    container.innerHTML = `<div style="max-height:320px;overflow-y:auto;">` + data.map(l=>{
+      const quando = new Date(l.criado_em).toLocaleString('pt-BR');
+      return `<div style="padding:7px 0;border-bottom:1px solid var(--line);font-size:12px;">
+        <strong style="color:var(--ink);">${escapeHtml(l.acao)}</strong>
+        ${l.detalhe ? ` — ${escapeHtml(l.detalhe)}` : ''}
+        <div style="color:var(--muted);font-size:11px;margin-top:2px;">${escapeHtml(l.usuario_email||'—')} · ${quando}</div>
+      </div>`;
+    }).join('') + `</div>`;
+  }catch(e){
+    container.innerHTML = `<div style="color:var(--muted);font-size:12.5px;">Não foi possível carregar o log de atividades.</div>`;
+  }
 }
 document.getElementById('btn-salvar-settings').addEventListener('click', async ()=>{
   DATA.settings = Object.assign({}, DATA.settings, {
@@ -3994,7 +4291,7 @@ document.getElementById('btn-salvar-settings').addEventListener('click', async (
     pixTitular: document.getElementById('f-settings-pixnome').value.trim(),
   });
   const ok = await saveData();
-  if(ok) showToast('Dados de recebimento salvos.');
+  if(ok){ showToast('Dados de recebimento salvos.'); registrarLogAtividade('Dados de PIX alterados', ''); }
 });
 
 /* ================= BACKUP / RESTAURAÇÃO ================= */
@@ -4114,6 +4411,53 @@ function esconderTelaLogin(){
   document.getElementById('login-screen').style.display = 'none';
   document.querySelector('.app').style.display = 'flex';
 }
+/* ================= PERFIS DE USUÁRIO (Admin / Colaborador) ================= */
+let currentUserRole = 'admin'; // fora do Supabase (modo único usuário), acesso total por padrão
+let currentUserEmail = '';
+
+function podeExcluir(){
+  if(currentUserRole !== 'admin'){
+    showToast('Apenas administradores podem excluir registros.');
+    return false;
+  }
+  return true;
+}
+function aplicarRestricoesPerfil(){
+  document.body.classList.toggle('role-colaborador', currentUserRole !== 'admin');
+}
+async function carregarPerfilUsuario(session){
+  if(!useSupabase() || !session || !session.user){
+    currentUserRole = 'admin';
+    aplicarRestricoesPerfil();
+    return;
+  }
+  currentUserEmail = session.user.email || '';
+  try{
+    const userId = session.user.id;
+    let { data } = await supabaseClient.from('perfis_usuarios').select('role').eq('user_id', userId).maybeSingle();
+    if(!data){
+      const ins = await supabaseClient.from('perfis_usuarios')
+        .insert({ user_id: userId, email: currentUserEmail })
+        .select('role').maybeSingle();
+      data = ins.data;
+    }
+    currentUserRole = (data && data.role) || 'colaborador';
+  }catch(e){
+    currentUserRole = 'colaborador'; // se não for possível confirmar o perfil, restringe por segurança
+  }
+  aplicarRestricoesPerfil();
+}
+
+/* ================= LOG DE ATIVIDADES (auditoria) ================= */
+function registrarLogAtividade(acao, detalhe){
+  if(!useSupabase() || !supabaseClient) return;
+  supabaseClient.from('log_atividades').insert({
+    usuario_email: currentUserEmail || null,
+    acao,
+    detalhe: detalhe ? String(detalhe).slice(0,300) : null,
+  }).then(()=>{}).catch(()=>{});
+}
+
 function aposLoginOk(session){
   esconderTelaLogin();
   sessaoAtiva = true;
@@ -4121,12 +4465,19 @@ function aposLoginOk(session){
   const info = document.getElementById('sidebar-user-info');
   if(info && session && session.user){
     info.innerHTML = `
-      <div style="margin-bottom:8px;">👤 ${escapeHtml(session.user.email)}</div>
+      <div style="margin-bottom:8px;">👤 ${escapeHtml(session.user.email)} <span class="role-badge" id="sidebar-role-badge"></span></div>
       <button type="button" class="sidebar-logout-btn" onclick="fazerLogout();">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sair
       </button>`;
   }
+  carregarPerfilUsuario(session).then(()=>{
+    const badge = document.getElementById('sidebar-role-badge');
+    if(badge){
+      badge.textContent = currentUserRole==='admin' ? 'Admin' : 'Colaborador';
+      badge.className = 'role-badge ' + (currentUserRole==='admin' ? 'admin' : 'colaborador');
+    }
+  });
   loadData();
 }
 async function fazerLogin(){
