@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRM Contabilidade Miranda</title>
+<title>Contabilidade Miranda</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -92,6 +92,22 @@
 .fechamento-item-label{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink);cursor:pointer;}
 .fechamento-item-label input{width:16px;height:16px;flex:0 0 auto;accent-color:var(--primary);}
 .fechamento-item-label.feito span{color:var(--muted);text-decoration:line-through;}
+
+.mei-card{padding:14px 16px;margin-bottom:10px;}
+.mei-card-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:14px;flex-wrap:wrap;}
+.mei-progress-track{width:100%;max-width:320px;height:8px;border-radius:5px;background:var(--line);overflow:hidden;margin-top:8px;}
+.mei-progress-fill{height:100%;border-radius:5px;transition:width .2s ease;background:var(--primary);}
+.mei-progress-fill.alerta{background:var(--accent);}
+.mei-progress-fill.estourado{background:var(--danger);}
+.mei-saldo{font-family:var(--font-mono);font-size:13px;color:var(--muted);white-space:nowrap;text-align:right;}
+.mei-saldo strong{display:block;font-size:15px;}
+.mei-saldo.alerta strong{color:var(--accent);}
+.mei-saldo.estourado strong{color:var(--danger);}
+.mei-meses-grid{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.mei-mes-field{display:flex;flex-direction:column;gap:3px;}
+.mei-mes-field label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+.mei-mes-field input{padding:6px 8px;border:1px solid var(--line-strong);border-radius:6px;font-size:12px;font-family:var(--font-mono);}
+@media (max-width:700px){ .mei-meses-grid{grid-template-columns:repeat(2,1fr);} }
 
 /* Restrições visuais para o papel "Colaborador" (a proteção real acontece
    também dentro das próprias funções de exclusão, em JavaScript). */
@@ -979,6 +995,10 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Fechamento
       </button>
+      <button class="nav-btn" data-view="mei">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Faturamento MEI
+      </button>
       <button class="nav-btn" data-view="pagamentos">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Financeiro
@@ -1363,6 +1383,23 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
       <div id="fechamento-container"></div>
     </section>
 
+    <!-- FATURAMENTO MEI -->
+    <section class="view" id="view-mei">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Faturamento MEI</h1>
+          <div class="view-desc">Acompanhe o faturamento acumulado de cada cliente MEI frente ao teto anual</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <select class="filter" id="mei-ano-select"></select>
+        </div>
+      </div>
+      <div class="card" style="padding:14px 18px;margin-bottom:18px;font-size:12px;color:var(--muted);line-height:1.7;">
+        Teto anual do MEI: <strong style="color:var(--ink);">R$ 81.000,00</strong>. Se a empresa abriu no meio do ano, o limite é proporcional (R$ 6.750,00 por mês de atividade, incluindo o mês de abertura) — calculado automaticamente a partir da Data de abertura cadastrada no cliente.
+      </div>
+      <div id="mei-container"></div>
+    </section>
+
     <!-- PAGAMENTOS -->
     <section class="view" id="view-pagamentos">
       <div class="view-header">
@@ -1499,6 +1536,24 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <div class="card-label" style="margin-bottom:8px;">Atividades recentes</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Registro de exclusões e outras ações importantes feitas por qualquer pessoa da equipe.</div>
           <div id="log-atividades-container"></div>
+        </div>
+
+        <div class="card" style="padding:22px 24px;">
+          <div class="card-label" style="margin-bottom:8px;">Dados do escritório (para contratos)</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Usados para preencher automaticamente o contrato de prestação de serviços gerado para cada cliente.</div>
+          <div class="field-row">
+            <div class="field" style="flex:2;"><label>Razão social do escritório</label><input type="text" id="f-settings-escr-nome" placeholder="Nome completo do escritório de contabilidade"></div>
+            <div class="field"><label>CNPJ do escritório</label><input type="text" id="f-settings-escr-cnpj" placeholder="00.000.000/0000-00"></div>
+          </div>
+          <div class="field">
+            <label>Endereço do escritório</label>
+            <input type="text" id="f-settings-escr-endereco" placeholder="Rua, número, bairro, cidade - UF">
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Responsável técnico</label><input type="text" id="f-settings-escr-responsavel" placeholder="Nome do contador responsável"></div>
+            <div class="field"><label>CRC</label><input type="text" id="f-settings-escr-crc" placeholder="Ex.: MG-012345/O-0"></div>
+          </div>
+          <button class="btn" id="btn-salvar-escritorio">Salvar dados do escritório</button>
         </div>
 
         <div class="card" style="padding:22px 24px;">
@@ -2204,7 +2259,7 @@ function iniciarSincronizacaoTempoReal(){
 function normalizeData(parsed){
   const d = Object.assign({
     clients: [], collections: [], services: [], payments: [],
-    charges: [], settings: {}, nextClientCode: 1, agenda: [], checklists: []
+    charges: [], settings: {}, nextClientCode: 1, agenda: [], checklists: [], faturamentosMei: []
   }, parsed || {});
 
   if(!Array.isArray(d.clients)) d.clients = [];
@@ -2214,6 +2269,7 @@ function normalizeData(parsed){
   if(!Array.isArray(d.agenda)) d.agenda = [];
   if(!Array.isArray(d.charges)) d.charges = [];
   if(!Array.isArray(d.checklists)) d.checklists = [];
+  if(!Array.isArray(d.faturamentosMei)) d.faturamentosMei = [];
   if(!d.settings || typeof d.settings !== 'object') d.settings = {};
   if(!d.nextClientCode) d.nextClientCode = 1;
 
@@ -2416,6 +2472,7 @@ function switchView(view){
   if(view!=='ficha') renderAll();
   if(view==='sistema') renderSistemaSettings();
   if(view==='fechamento') renderFechamento();
+  if(view==='mei') renderFaturamentoMei();
 }
 
 /* ================= MODAL HELPERS ================= */
@@ -2950,6 +3007,7 @@ function renderClientes(){
       <td>
         <div class="row-actions">
           <button class="icon-btn" title="Ver ficha" onclick="abrirFicha('${c.id}')">📄</button>
+          <button class="icon-btn" title="Gerar contrato" onclick="abrirContrato('${c.id}')">📝</button>
           <button class="icon-btn" title="Enviar mensagem via WhatsApp" onclick="abrirMensagemWhatsapp('${c.id}')">💬</button>
           <button class="icon-btn" title="Editar" onclick="editarCliente('${c.id}')">✎</button>
           <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirCliente('${c.id}')">🗑</button>
@@ -3535,6 +3593,104 @@ document.getElementById('btn-salvar-checklist-padrao').addEventListener('click',
   showToast(`Modelo de "${CHECKLIST_REGIME_LABELS[chave]}" salvo. Vale a partir do próximo mês gerado.`);
 });
 
+/* ================= FATURAMENTO MEI (controle de teto anual) ================= */
+const MEI_TETO_ANUAL = 81000;
+function meiLimiteAno(client, ano){
+  if(client.dataAbertura){
+    const abertura = new Date(client.dataAbertura+'T00:00:00');
+    if(!isNaN(abertura.getTime()) && abertura.getFullYear()===ano){
+      const mesesAtivos = 13 - (abertura.getMonth()+1); // meses restantes no ano, incluindo o mês de abertura
+      return Math.round((MEI_TETO_ANUAL/12) * mesesAtivos * 100)/100;
+    }
+  }
+  return MEI_TETO_ANUAL;
+}
+function meiFaturamentoAno(clientId, ano){
+  return DATA.faturamentosMei.filter(f=>f.clientId===clientId && f.ano===ano).reduce((s,f)=>s+Number(f.valor||0),0);
+}
+function meiValorMes(clientId, ano, mes){
+  const registro = DATA.faturamentosMei.find(f=>f.clientId===clientId && f.ano===ano && f.mes===mes);
+  return registro ? Number(registro.valor||0) : 0;
+}
+function clientesMei(){
+  return DATA.clients.filter(c=>c.tipoEmpresa==='PJ' && c.regimeTributario==='MEI');
+}
+function renderFaturamentoMei(){
+  const anoSelect = document.getElementById('mei-ano-select');
+  if(!anoSelect) return;
+  const anoAtual = new Date().getFullYear();
+  const anosComDados = Array.from(new Set(DATA.faturamentosMei.map(f=>f.ano)));
+  const anos = Array.from(new Set([anoAtual, ...anosComDados])).sort((a,b)=>b-a);
+  const anterior = anoSelect.value;
+  anoSelect.innerHTML = anos.map(a=>`<option value="${a}">${a}</option>`).join('');
+  anoSelect.value = anos.includes(Number(anterior)) ? anterior : String(anoAtual);
+  renderFaturamentoMeiLista(Number(anoSelect.value));
+}
+function renderFaturamentoMeiLista(ano){
+  const container = document.getElementById('mei-container');
+  if(!container) return;
+  const clientes = clientesMei().sort((a,b)=>a.nome.localeCompare(b.nome));
+  if(!clientes.length){
+    container.innerHTML = `<div class="empty" style="padding:40px 20px;"><p>Nenhum cliente cadastrado como MEI ainda. Defina o regime tributário como "MEI" no cadastro do cliente.</p></div>`;
+    return;
+  }
+  container.innerHTML = clientes.map(c=>{
+    const limite = meiLimiteAno(c, ano);
+    const total = meiFaturamentoAno(c.id, ano);
+    const pct = limite>0 ? Math.min(100, Math.round((total/limite)*100)) : 0;
+    const saldo = limite - total;
+    const nivel = total>=limite ? 'estourado' : (pct>=80 ? 'alerta' : '');
+    const mesesHtml = MESES_PT.map((label, idx)=>{
+      const mes = idx+1;
+      const valor = meiValorMes(c.id, ano, mes);
+      return `<div class="mei-mes-field">
+        <label>${label}</label>
+        <input type="number" step="0.01" min="0" value="${valor||''}" placeholder="0,00"
+          onchange="salvarFaturamentoMei('${c.id}', ${ano}, ${mes}, this.value)">
+      </div>`;
+    }).join('');
+    return `<div class="card mei-card">
+      <div class="mei-card-head" onclick="toggleMeiCard('${c.id}')">
+        <div>
+          <strong>${escapeHtml(c.nome)}</strong>
+          <div class="mei-progress-track"><div class="mei-progress-fill ${nivel}" style="width:${pct}%;"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">${pct}% do limite de ${fmtMoney(limite)}${limite<MEI_TETO_ANUAL ? ' (proporcional ao ano de abertura)' : ''}</div>
+        </div>
+        <div class="mei-saldo ${nivel}">
+          <span>Faturado: ${fmtMoney(total)}</span>
+          <strong>${saldo>=0 ? fmtMoney(saldo)+' restante' : 'Excedeu em '+fmtMoney(Math.abs(saldo))}</strong>
+        </div>
+      </div>
+      <div class="mei-meses-grid" id="mei-meses-${c.id}" style="display:none;">${mesesHtml}</div>
+    </div>`;
+  }).join('');
+}
+function toggleMeiCard(clientId){
+  const el = document.getElementById('mei-meses-'+clientId);
+  if(el) el.style.display = el.style.display==='none' ? 'grid' : 'none';
+}
+function salvarFaturamentoMei(clientId, ano, mes, valorStr){
+  const valor = Number(valorStr||0);
+  let registro = DATA.faturamentosMei.find(f=>f.clientId===clientId && f.ano===ano && f.mes===mes);
+  if(!registro){
+    registro = { id: uid(), clientId, ano, mes, valor };
+    DATA.faturamentosMei.push(registro);
+  } else {
+    registro.valor = valor;
+  }
+  saveData();
+  renderFaturamentoMeiLista(ano);
+  const c = DATA.clients.find(x=>x.id===clientId);
+  const limite = meiLimiteAno(c, ano);
+  const total = meiFaturamentoAno(clientId, ano);
+  if(total >= limite){
+    showToast(`⚠️ ${c.nome} já ultrapassou o teto do MEI em ${ano}.`);
+  } else if(total >= limite*0.8){
+    showToast(`⚠️ ${c.nome} está próximo do teto do MEI em ${ano} (${Math.round((total/limite)*100)}%).`);
+  }
+}
+document.getElementById('mei-ano-select').addEventListener('change', (e)=> renderFaturamentoMeiLista(Number(e.target.value)));
+
 function renderChartRecebimentos(containerId){
   const container = document.getElementById(containerId || 'chart-recebimentos');
   if(!container) return;
@@ -4071,6 +4227,94 @@ function imprimirAutorizacaoServico(id){
   switchView('ficha');
 }
 
+/* ================= CONTRATO DE PRESTAÇÃO DE SERVIÇOS ================= */
+function abrirContrato(clientId){
+  const c = DATA.clients.find(x=>x.id===clientId);
+  if(!c) return;
+  const s = DATA.settings || {};
+  const hoje = new Date();
+  const dataExtenso = hoje.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  const honorarioTxt = c.honorario ? fmtMoney(c.honorario) : 'a combinar';
+  const periodicidade = (c.tipoCliente||'Mensal')==='Mensal' ? 'mensal' : 'por serviço avulso, conforme demanda';
+  const cidadeForo = (s.escritorioEndereco||'').split(',').pop().trim() || '_________________';
+
+  document.getElementById('print-area').innerHTML = `
+    <div class="ficha-sheet">
+      <div class="ficha-top" style="display:block;">
+        <div style="font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--primary);">${escapeHtml(s.escritorioNome || 'Escritório de Contabilidade')}</div>
+        ${s.escritorioCnpj ? `<div style="font-size:11px;color:var(--muted);">CNPJ ${escapeHtml(s.escritorioCnpj)}${s.escritorioEndereco ? ' · '+escapeHtml(s.escritorioEndereco) : ''}</div>` : ''}
+        <div class="ficha-date">Emitido em ${new Date().toLocaleDateString('pt-BR')}</div>
+      </div>
+      <h2 class="ficha-client-name">Contrato de Prestação de Serviços Contábeis</h2>
+
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:14px;">
+        <strong>CONTRATADA:</strong> ${escapeHtml(s.escritorioNome || '_________________________________')},
+        ${s.escritorioCnpj ? `inscrita no CNPJ sob o nº ${escapeHtml(s.escritorioCnpj)}, ` : ''}
+        com sede em ${escapeHtml(s.escritorioEndereco || '_________________________________')},
+        neste ato representada por ${escapeHtml(s.escritorioResponsavel || '_________________________________')}${s.escritorioCrc ? `, registrado no CRC sob o nº ${escapeHtml(s.escritorioCrc)}` : ''}.
+      </p>
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
+        <strong>CONTRATANTE:</strong> ${escapeHtml(c.nome)}${c.nomeEmpresa ? ` (${escapeHtml(c.nomeEmpresa)})` : ''},
+        ${c.tipoEmpresa==='PJ' ? 'pessoa jurídica' : 'pessoa física'}, inscrita sob o documento ${escapeHtml(clientDoc(c)||'_________________________')},
+        com endereço em ${escapeHtml(c.endereco || '_________________________________')}.
+      </p>
+
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
+        As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Prestação de Serviços Contábeis, que se regerá pelas cláusulas seguintes:
+      </p>
+
+      <div class="ficha-section-title">Cláusula 1ª — Do objeto</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        A CONTRATADA prestará à CONTRATANTE serviços de contabilidade, compreendendo, conforme o caso, escrituração contábil e fiscal, apuração de tributos, folha de pagamento, obrigações acessórias federais, estaduais e municipais, e orientação contábil geral necessária ao regular funcionamento da CONTRATANTE.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 2ª — Das obrigações da CONTRATADA</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        Executar os serviços contratados com zelo e observância da legislação vigente; manter sigilo sobre as informações e documentos da CONTRATANTE; comunicar tempestivamente prazos e pendências relacionadas às obrigações fiscais e trabalhistas.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 3ª — Das obrigações da CONTRATANTE</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        Fornecer, em tempo hábil, todos os documentos, informações e esclarecimentos necessários à execução dos serviços; efetuar o pagamento dos honorários nas datas ajustadas; comunicar à CONTRATADA qualquer alteração cadastral, societária ou operacional relevante.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 4ª — Do valor e forma de pagamento</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        Pelos serviços ora contratados, a CONTRATANTE pagará à CONTRATADA honorários no valor de <strong style="color:var(--ink);">${honorarioTxt}</strong>,
+        de periodicidade <strong style="color:var(--ink);">${periodicidade}</strong>, sujeitos a reajuste anual conforme variação de índice oficial ou novo acordo entre as partes.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 5ª — Do prazo e da rescisão</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        O presente contrato vigora por prazo indeterminado, a partir da data de sua assinatura, podendo ser rescindido por qualquer das partes mediante aviso prévio por escrito com antecedência mínima de 30 (trinta) dias, ficando ressalvado o pagamento dos serviços já prestados até a data da rescisão.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 6ª — Do sigilo e da proteção de dados</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        A CONTRATADA compromete-se a tratar as informações e os dados pessoais a que tiver acesso em decorrência deste contrato com confidencialidade, utilizando-os exclusivamente para a execução dos serviços aqui previstos, em conformidade com a legislação de proteção de dados aplicável.
+      </p>
+
+      <div class="ficha-section-title">Cláusula 7ª — Do foro</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        Fica eleito o foro da comarca de ${escapeHtml(cidadeForo)} para dirimir quaisquer dúvidas ou controvérsias oriundas deste contrato, renunciando as partes a qualquer outro, por mais privilegiado que seja.
+      </p>
+
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:18px;">
+        E por estarem assim justas e contratadas, as partes firmam o presente instrumento em duas vias de igual teor.
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">${escapeHtml(cidadeForo)}, ${dataExtenso}.</p>
+
+      <div style="display:flex;justify-content:space-between;gap:30px;margin-top:60px;">
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">CONTRATADA<br>${escapeHtml(s.escritorioNome||'')}</div>
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">CONTRATANTE<br>${escapeHtml(c.nome)}</div>
+      </div>
+    </div>
+  `;
+  fichaReturnView = 'clientes';
+  document.getElementById('ficha-view-title').textContent = 'Contrato de prestação de serviços';
+  switchView('ficha');
+}
+
 /* ================= EXPORTAÇÃO: RELATÓRIO DE INADIMPLÊNCIA ================= */
 /* Gera um CSV com todas as cobranças em atraso (vencimento passado e saldo > 0),
    respeitando o filtro de período aplicado na tela de Cobranças, para uso em
@@ -4322,6 +4566,11 @@ function renderSistemaSettings(){
   document.getElementById('f-settings-pixkey').value = (DATA.settings && DATA.settings.pixKey) || '';
   document.getElementById('f-settings-pixnome').value = (DATA.settings && DATA.settings.pixTitular) || '';
   document.getElementById('f-settings-drivefolder').value = (DATA.settings && DATA.settings.driveFolder) || '';
+  document.getElementById('f-settings-escr-nome').value = (DATA.settings && DATA.settings.escritorioNome) || '';
+  document.getElementById('f-settings-escr-cnpj').value = (DATA.settings && DATA.settings.escritorioCnpj) || '';
+  document.getElementById('f-settings-escr-endereco').value = (DATA.settings && DATA.settings.escritorioEndereco) || '';
+  document.getElementById('f-settings-escr-responsavel').value = (DATA.settings && DATA.settings.escritorioResponsavel) || '';
+  document.getElementById('f-settings-escr-crc').value = (DATA.settings && DATA.settings.escritorioCrc) || '';
   const label = document.getElementById('storage-backend-label');
   if(label) label.textContent = storageBackendName();
   renderAvisoBackup();
@@ -4330,6 +4579,17 @@ function renderSistemaSettings(){
     renderLogAtividades();
   }
 }
+document.getElementById('btn-salvar-escritorio').addEventListener('click', async ()=>{
+  DATA.settings = Object.assign({}, DATA.settings, {
+    escritorioNome: document.getElementById('f-settings-escr-nome').value.trim(),
+    escritorioCnpj: document.getElementById('f-settings-escr-cnpj').value.trim(),
+    escritorioEndereco: document.getElementById('f-settings-escr-endereco').value.trim(),
+    escritorioResponsavel: document.getElementById('f-settings-escr-responsavel').value.trim(),
+    escritorioCrc: document.getElementById('f-settings-escr-crc').value.trim(),
+  });
+  const ok = await saveData();
+  if(ok){ showToast('Dados do escritório salvos.'); registrarLogAtividade('Dados do escritório alterados', ''); }
+});
 
 /* ---- Equipe e permissões (somente administradores) ---- */
 async function renderEquipePermissoes(){
