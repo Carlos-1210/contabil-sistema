@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contabilidade Miranda</title>
+<title>CRM Contabilidade Miranda</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -1003,6 +1003,10 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Financeiro
       </button>
+      <button class="nav-btn" data-view="prestador">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Prestador
+      </button>
       <button class="nav-btn" data-view="sistema">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Sistema
@@ -1400,6 +1404,55 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
       <div id="mei-container"></div>
     </section>
 
+    <!-- PRESTADOR DE SERVIÇO (CONTRATADO nos contratos) -->
+    <section class="view" id="view-prestador">
+      <div class="view-header">
+        <div>
+          <h1 class="view-title">Cadastro do prestador de serviço</h1>
+          <div class="view-desc">Dados do profissional/escritório contábil — usados como "CONTRATADO" ao gerar contratos</div>
+        </div>
+      </div>
+      <div class="card" style="padding:22px 24px;max-width:760px;">
+        <div class="field-row">
+          <div class="field" style="flex:2;"><label>Nome fantasia</label><input type="text" id="f-prest-fantasia" placeholder="Nome comercial do escritório"></div>
+          <div class="field"><label>Nacionalidade</label><input type="text" id="f-prest-nacionalidade" placeholder="Brasileiro(a)"></div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:2;"><label>Responsável</label><input type="text" id="f-prest-responsavel" placeholder="Nome completo do contador responsável"></div>
+          <div class="field"><label>CPF</label><input type="text" id="f-prest-cpf" placeholder="000.000.000-00"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>CNPJ (se houver)</label><input type="text" id="f-prest-cnpj" placeholder="00.000.000/0000-00"></div>
+          <div class="field"><label>CRC</label><input type="text" id="f-prest-crc" placeholder="Ex.: MG-012345/O-0"></div>
+        </div>
+
+        <div class="field" style="max-width:200px;">
+          <label>CEP</label>
+          <div style="position:relative;">
+            <input type="text" id="f-prest-cep" placeholder="00000-000" style="padding-right:74px!important;">
+            <span id="prest-cep-status" style="display:none;position:absolute;right:74px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--primary);font-weight:600;">Buscando...</span>
+            <button type="button" id="btn-buscar-cep-prest" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--primary);font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 7px;border-radius:6px;cursor:pointer;" title="Buscar endereço deste CEP">🔄 Buscar</button>
+          </div>
+          <small id="prest-cep-hint">Preenchido automaticamente ao digitar o CEP</small>
+        </div>
+        <div class="field">
+          <label>Logradouro</label>
+          <input type="text" id="f-prest-logradouro" placeholder="Rua, Avenida, Praça...">
+        </div>
+        <div class="endereco-grid">
+          <div class="field"><label>Nº</label><input type="text" id="f-prest-numero" placeholder="Nº"></div>
+          <div class="field"><label>Bairro</label><input type="text" id="f-prest-bairro"></div>
+          <div class="field"><label>Cidade</label><input type="text" id="f-prest-cidade"></div>
+        </div>
+        <div class="field" style="max-width:110px;">
+          <label>UF</label>
+          <input type="text" id="f-prest-uf" placeholder="UF" maxlength="2" style="text-transform:uppercase;">
+        </div>
+
+        <button class="btn" id="btn-salvar-prestador" style="margin-top:6px;">Salvar dados do prestador</button>
+      </div>
+    </section>
+
     <!-- PAGAMENTOS -->
     <section class="view" id="view-pagamentos">
       <div class="view-header">
@@ -1536,24 +1589,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <div class="card-label" style="margin-bottom:8px;">Atividades recentes</div>
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Registro de exclusões e outras ações importantes feitas por qualquer pessoa da equipe.</div>
           <div id="log-atividades-container"></div>
-        </div>
-
-        <div class="card" style="padding:22px 24px;">
-          <div class="card-label" style="margin-bottom:8px;">Dados do escritório (para contratos)</div>
-          <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Usados para preencher automaticamente o contrato de prestação de serviços gerado para cada cliente.</div>
-          <div class="field-row">
-            <div class="field" style="flex:2;"><label>Razão social do escritório</label><input type="text" id="f-settings-escr-nome" placeholder="Nome completo do escritório de contabilidade"></div>
-            <div class="field"><label>CNPJ do escritório</label><input type="text" id="f-settings-escr-cnpj" placeholder="00.000.000/0000-00"></div>
-          </div>
-          <div class="field">
-            <label>Endereço do escritório</label>
-            <input type="text" id="f-settings-escr-endereco" placeholder="Rua, número, bairro, cidade - UF">
-          </div>
-          <div class="field-row">
-            <div class="field"><label>Responsável técnico</label><input type="text" id="f-settings-escr-responsavel" placeholder="Nome do contador responsável"></div>
-            <div class="field"><label>CRC</label><input type="text" id="f-settings-escr-crc" placeholder="Ex.: MG-012345/O-0"></div>
-          </div>
-          <button class="btn" id="btn-salvar-escritorio">Salvar dados do escritório</button>
         </div>
 
         <div class="card" style="padding:22px 24px;">
@@ -2028,8 +2063,12 @@ let currentChargeId = null;
 
 function uid(){ return 'id_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 
+/* Formato contábil: separador de milhar, vírgula decimal e negativos entre
+   parênteses (convenção contábil padrão), em vez de sinal de menos. */
 function fmtMoney(v){
-  return (Number(v)||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  const num = Number(v)||0;
+  const abs = Math.abs(num).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+  return num < 0 ? `(${abs})` : abs;
 }
 
 /* ---- máscara de moeda para campos de valor (formata enquanto digita) ---- */
@@ -2106,6 +2145,92 @@ document.getElementById('btn-buscar-cnpj').addEventListener('click', ()=>{
   if(digits.length !== 14){ showToast('Digite um CNPJ completo (14 dígitos) antes de buscar.'); return; }
   buscarDadosCnpj(digits);
 });
+
+/* ================= CADASTRO DO PRESTADOR DE SERVIÇO ================= */
+function renderPrestador(){
+  const p = DATA.prestador || {};
+  document.getElementById('f-prest-fantasia').value = p.nomeFantasia || '';
+  document.getElementById('f-prest-nacionalidade').value = p.nacionalidade || 'Brasileiro(a)';
+  document.getElementById('f-prest-responsavel').value = p.responsavel || '';
+  document.getElementById('f-prest-cpf').value = p.cpf || '';
+  document.getElementById('f-prest-cnpj').value = p.cnpj || '';
+  document.getElementById('f-prest-crc').value = p.crc || '';
+  document.getElementById('f-prest-cep').value = p.cep || '';
+  document.getElementById('f-prest-logradouro').value = p.logradouro || '';
+  document.getElementById('f-prest-numero').value = p.numero || '';
+  document.getElementById('f-prest-bairro').value = p.bairro || '';
+  document.getElementById('f-prest-cidade').value = p.cidade || '';
+  document.getElementById('f-prest-uf').value = p.uf || '';
+}
+document.getElementById('btn-salvar-prestador').addEventListener('click', async ()=>{
+  const logradouro = document.getElementById('f-prest-logradouro').value.trim();
+  const numero = document.getElementById('f-prest-numero').value.trim();
+  const bairro = document.getElementById('f-prest-bairro').value.trim();
+  const cidade = document.getElementById('f-prest-cidade').value.trim();
+  const uf = document.getElementById('f-prest-uf').value.trim().toUpperCase();
+  DATA.prestador = {
+    nomeFantasia: document.getElementById('f-prest-fantasia').value.trim(),
+    nacionalidade: document.getElementById('f-prest-nacionalidade').value.trim(),
+    responsavel: document.getElementById('f-prest-responsavel').value.trim(),
+    cpf: document.getElementById('f-prest-cpf').value.trim(),
+    cnpj: document.getElementById('f-prest-cnpj').value.trim(),
+    crc: document.getElementById('f-prest-crc').value.trim(),
+    cep: document.getElementById('f-prest-cep').value.trim(),
+    logradouro, numero, bairro, cidade, uf,
+    endereco: [
+      logradouro, numero ? 'nº '+numero : '', bairro,
+      cidade && uf ? `${cidade}/${uf}` : (cidade||uf)
+    ].filter(Boolean).join(', '),
+  };
+  const ok = await saveData();
+  if(ok){ showToast('Dados do prestador salvos.'); registrarLogAtividade('Dados do prestador alterados', ''); }
+});
+
+/* Busca automática de endereço ao digitar um CEP completo (8 dígitos),
+   usando a ViaCEP (gratuita, sem necessidade de chave). */
+let cepLookupTimeout = null;
+document.getElementById('f-prest-cep').addEventListener('input', ()=>{
+  clearTimeout(cepLookupTimeout);
+  const digits = (document.getElementById('f-prest-cep').value||'').replace(/\D/g,'');
+  const hintEl = document.getElementById('prest-cep-hint');
+  if(digits.length !== 8){
+    if(hintEl) hintEl.textContent = 'Preenchido automaticamente ao digitar o CEP';
+    return;
+  }
+  cepLookupTimeout = setTimeout(()=> buscarDadosCep(digits), 500);
+});
+document.getElementById('btn-buscar-cep-prest').addEventListener('click', ()=>{
+  const digits = (document.getElementById('f-prest-cep').value||'').replace(/\D/g,'');
+  if(digits.length !== 8){ showToast('Digite um CEP completo (8 dígitos) antes de buscar.'); return; }
+  buscarDadosCep(digits);
+});
+async function buscarDadosCep(digits){
+  const statusEl = document.getElementById('prest-cep-status');
+  const hintEl = document.getElementById('prest-cep-hint');
+  if(statusEl) statusEl.style.display = 'inline';
+  if(hintEl){ hintEl.textContent = 'Consultando endereço...'; hintEl.style.color = 'var(--muted)'; }
+  try{
+    const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const d = await res.json();
+    if(d.erro) throw new Error('CEP não encontrado');
+    const preenche = (id, valor)=>{ if(valor){ const c=document.getElementById(id); if(c) c.value = valor; } };
+    preenche('f-prest-logradouro', d.logradouro);
+    preenche('f-prest-bairro', d.bairro);
+    preenche('f-prest-cidade', d.localidade);
+    preenche('f-prest-uf', d.uf);
+    if(hintEl){ hintEl.textContent = '✅ Endereço preenchido automaticamente pelos Correios (ViaCEP).'; hintEl.style.color = 'var(--primary)'; }
+    showToast('Endereço preenchido automaticamente.');
+    document.getElementById('f-prest-numero').focus();
+  }catch(e){
+    console.error('Busca de CEP falhou:', e);
+    if(hintEl){ hintEl.textContent = 'Não foi possível localizar este CEP — preencha manualmente.'; hintEl.style.color = 'var(--muted)'; }
+    showToast('Não foi possível consultar este CEP agora.');
+  }finally{
+    if(statusEl) statusEl.style.display = 'none';
+  }
+}
+
 function formatarTelefoneBR(v){
   const d = (v||'').replace(/\D/g,'');
   if(d.length===11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
@@ -2270,6 +2395,7 @@ function normalizeData(parsed){
   if(!Array.isArray(d.charges)) d.charges = [];
   if(!Array.isArray(d.checklists)) d.checklists = [];
   if(!Array.isArray(d.faturamentosMei)) d.faturamentosMei = [];
+  if(!d.prestador || typeof d.prestador !== 'object') d.prestador = {};
   if(!d.settings || typeof d.settings !== 'object') d.settings = {};
   if(!d.nextClientCode) d.nextClientCode = 1;
 
@@ -2473,6 +2599,7 @@ function switchView(view){
   if(view==='sistema') renderSistemaSettings();
   if(view==='fechamento') renderFechamento();
   if(view==='mei') renderFaturamentoMei();
+  if(view==='prestador') renderPrestador();
 }
 
 /* ================= MODAL HELPERS ================= */
@@ -3645,8 +3772,7 @@ function renderFaturamentoMeiLista(ano){
       const valor = meiValorMes(c.id, ano, mes);
       return `<div class="mei-mes-field">
         <label>${label}</label>
-        <input type="number" step="0.01" min="0" value="${valor||''}" placeholder="0,00"
-          onchange="salvarFaturamentoMei('${c.id}', ${ano}, ${mes}, this.value)">
+        <input type="text" inputmode="decimal" class="mei-input-valor" data-client="${c.id}" data-ano="${ano}" data-mes="${mes}" value="${valor ? formatCentsToBRL(Math.round(valor*100)) : ''}" placeholder="R$ 0,00">
       </div>`;
     }).join('');
     return `<div class="card mei-card">
@@ -3664,13 +3790,18 @@ function renderFaturamentoMeiLista(ano){
       <div class="mei-meses-grid" id="mei-meses-${c.id}" style="display:none;">${mesesHtml}</div>
     </div>`;
   }).join('');
+  container.querySelectorAll('.mei-input-valor').forEach(el=>{
+    attachMoneyMask(el);
+    el.addEventListener('change', ()=>{
+      salvarFaturamentoMei(el.dataset.client, Number(el.dataset.ano), Number(el.dataset.mes), moneyInputToNumber(el));
+    });
+  });
 }
 function toggleMeiCard(clientId){
   const el = document.getElementById('mei-meses-'+clientId);
   if(el) el.style.display = el.style.display==='none' ? 'grid' : 'none';
 }
-function salvarFaturamentoMei(clientId, ano, mes, valorStr){
-  const valor = Number(valorStr||0);
+function salvarFaturamentoMei(clientId, ano, mes, valor){
   let registro = DATA.faturamentosMei.find(f=>f.clientId===clientId && f.ano===ano && f.mes===mes);
   if(!registro){
     registro = { id: uid(), clientId, ano, mes, valor };
@@ -4231,82 +4362,139 @@ function imprimirAutorizacaoServico(id){
 function abrirContrato(clientId){
   const c = DATA.clients.find(x=>x.id===clientId);
   if(!c) return;
-  const s = DATA.settings || {};
+  const p = DATA.prestador || {};
   const hoje = new Date();
   const dataExtenso = hoje.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-  const honorarioTxt = c.honorario ? fmtMoney(c.honorario) : 'a combinar';
-  const periodicidade = (c.tipoCliente||'Mensal')==='Mensal' ? 'mensal' : 'por serviço avulso, conforme demanda';
-  const cidadeForo = (s.escritorioEndereco||'').split(',').pop().trim() || '_________________';
+  const fimVigencia = new Date(hoje); fimVigencia.setFullYear(fimVigencia.getFullYear()+1);
+  const dataFimExtenso = fimVigencia.toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+  const honorarioTxt = c.honorario ? fmtMoney(c.honorario) : '_________________';
+  const enquadramento = c.regimeTributario === 'MEI' ? 'Microempreendedor Individual (MEI)'
+    : c.regimeTributario ? `optante pelo regime tributário ${escapeHtml(c.regimeTributario)}`
+    : 'conforme seu regime tributário';
+
+  const contratanteDoc = c.tipoEmpresa==='PJ'
+    ? `CNPJ: ${escapeHtml(c.cnpj || '_________________')}`
+    : `CPF: ${escapeHtml(c.cpf || '_________________')}`;
+  const contratanteRepresentante = (c.tipoEmpresa==='PJ' && c.cpf)
+    ? `, neste ato representada por sua titular <strong>${escapeHtml(c.nome)}</strong>, CPF: <strong>${escapeHtml(c.cpf)}</strong>. Domiciliada em ${escapeHtml(c.endereco || '_________________________________')}`
+    : '';
+  const contratanteNomeExibido = c.tipoEmpresa==='PJ' ? escapeHtml(c.nomeEmpresa || c.nome) : escapeHtml(c.nome);
+
+  const prestNacionalidade = p.nacionalidade || 'brasileiro(a)';
+  const prestDocLinha = p.cnpj
+    ? `inscrito no CNPJ nº <strong>${escapeHtml(p.cnpj)}</strong>${p.crc?`, com registro profissional no CRC ${escapeHtml(p.crc)}`:''}`
+    : `${escapeHtml(prestNacionalidade)}, contador, inscrito no CPF nº <strong>${escapeHtml(p.cpf||'_________________')}</strong>${p.crc?`, com registro profissional no CRC/${escapeHtml(p.uf||'___')} ${escapeHtml(p.crc)}`:''}`;
+
+  const cidadeContratante = (c.cidade && c.uf) ? `${c.cidade}/${c.uf}` : (c.cidade || '_________________');
+  const cidadeContratado = (p.cidade && p.uf) ? `${p.cidade}/${p.uf}` : (p.cidade || '_________________');
 
   document.getElementById('print-area').innerHTML = `
     <div class="ficha-sheet">
       <div class="ficha-top" style="display:block;">
-        <div style="font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--primary);">${escapeHtml(s.escritorioNome || 'Escritório de Contabilidade')}</div>
-        ${s.escritorioCnpj ? `<div style="font-size:11px;color:var(--muted);">CNPJ ${escapeHtml(s.escritorioCnpj)}${s.escritorioEndereco ? ' · '+escapeHtml(s.escritorioEndereco) : ''}</div>` : ''}
+        <div style="font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--primary);">${escapeHtml(p.nomeFantasia || 'Contrato de Prestação de Serviços Contábeis')}</div>
         <div class="ficha-date">Emitido em ${new Date().toLocaleDateString('pt-BR')}</div>
       </div>
       <h2 class="ficha-client-name">Contrato de Prestação de Serviços Contábeis</h2>
 
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:14px;">
-        <strong>CONTRATADA:</strong> ${escapeHtml(s.escritorioNome || '_________________________________')},
-        ${s.escritorioCnpj ? `inscrita no CNPJ sob o nº ${escapeHtml(s.escritorioCnpj)}, ` : ''}
-        com sede em ${escapeHtml(s.escritorioEndereco || '_________________________________')},
-        neste ato representada por ${escapeHtml(s.escritorioResponsavel || '_________________________________')}${s.escritorioCrc ? `, registrado no CRC sob o nº ${escapeHtml(s.escritorioCrc)}` : ''}.
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.8;margin-top:14px;">
+        <strong>CONTRATANTE:</strong> <strong>${contratanteNomeExibido}</strong> – ${contratanteDoc}, instalada
+        na ${escapeHtml(c.logradouro||'_________')}, nº ${escapeHtml(c.numero||'___')}, bairro ${escapeHtml(c.bairro||'_________')},
+        ${escapeHtml(cidadeContratante)}${contratanteRepresentante}.
+      </p>
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.8;">
+        <strong>CONTRATADO:</strong> <strong>${escapeHtml(p.responsavel || '_________________________________')}</strong>,
+        ${prestDocLinha}, residente na ${escapeHtml(p.logradouro||'_________')}, nº ${escapeHtml(p.numero||'___')},
+        bairro ${escapeHtml(p.bairro||'_________')}, ${escapeHtml(cidadeContratado)}.
       </p>
       <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
-        <strong>CONTRATANTE:</strong> ${escapeHtml(c.nome)}${c.nomeEmpresa ? ` (${escapeHtml(c.nomeEmpresa)})` : ''},
-        ${c.tipoEmpresa==='PJ' ? 'pessoa jurídica' : 'pessoa física'}, inscrita sob o documento ${escapeHtml(clientDoc(c)||'_________________________')},
-        com endereço em ${escapeHtml(c.endereco || '_________________________________')}.
+        As partes acordam o presente contrato de prestação de serviços, que se regerá pelas cláusulas e condições abaixo:
       </p>
 
+      <div class="ficha-section-title">DO OBJETO DO CONTRATO</div>
       <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
-        As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Prestação de Serviços Contábeis, que se regerá pelas cláusulas seguintes:
+        <strong>CLÁUSULA 1ª:</strong> Constitui objeto do presente contrato a prestação de serviços contábeis digitais ao CONTRATANTE, enquadrado como ${enquadramento}, compreendendo as atividades abaixo descritas como serviços inclusos no honorário mensal e serviços à parte, conforme segue:
       </p>
-
-      <div class="ficha-section-title">Cláusula 1ª — Do objeto</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        A CONTRATADA prestará à CONTRATANTE serviços de contabilidade, compreendendo, conforme o caso, escrituração contábil e fiscal, apuração de tributos, folha de pagamento, obrigações acessórias federais, estaduais e municipais, e orientação contábil geral necessária ao regular funcionamento da CONTRATANTE.
+        <strong style="color:var(--ink);">Serviços inclusos no honorário mensal:</strong> apuração e envio mensal das guias de tributos devidos; acompanhamento das obrigações acessórias aplicáveis; elaboração e transmissão das declarações obrigatórias do regime; orientações gerais sobre obrigações fiscais, limites de faturamento e atividades permitidas; orientação para emissão de notas fiscais, mediante envio prévio das informações necessárias pelo CONTRATANTE; suporte para esclarecimento de dúvidas via canais digitais, em horário comercial.
       </p>
-
-      <div class="ficha-section-title">Cláusula 2ª — Das obrigações da CONTRATADA</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        Executar os serviços contratados com zelo e observância da legislação vigente; manter sigilo sobre as informações e documentos da CONTRATANTE; comunicar tempestivamente prazos e pendências relacionadas às obrigações fiscais e trabalhistas.
+        <strong style="color:var(--ink);">Serviços à parte (cobrança adicional):</strong> alterações cadastrais (endereço, atividades, nome fantasia); desenquadramento de regime; parcelamentos de débitos; regularizações fiscais; emissão de certidões específicas; atendimento a fiscalizações; obrigações acessórias não previstas como obrigatórias; demais serviços não incluídos no honorário mensal. Os serviços à parte serão previamente orçados e aprovados pelo CONTRATANTE.
       </p>
 
-      <div class="ficha-section-title">Cláusula 3ª — Das obrigações da CONTRATANTE</div>
+      <div class="ficha-section-title">DAS OBRIGAÇÕES</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        Fornecer, em tempo hábil, todos os documentos, informações e esclarecimentos necessários à execução dos serviços; efetuar o pagamento dos honorários nas datas ajustadas; comunicar à CONTRATADA qualquer alteração cadastral, societária ou operacional relevante.
+        <strong>CLÁUSULA 2ª:</strong> O CONTRATANTE deverá fornecer ao CONTRATADO todas as informações, documentos e dados necessários à execução dos serviços, responsabilizando-se integralmente pela veracidade das informações prestadas.
       </p>
-
-      <div class="ficha-section-title">Cláusula 4ª — Do valor e forma de pagamento</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        Pelos serviços ora contratados, a CONTRATANTE pagará à CONTRATADA honorários no valor de <strong style="color:var(--ink);">${honorarioTxt}</strong>,
-        de periodicidade <strong style="color:var(--ink);">${periodicidade}</strong>, sujeitos a reajuste anual conforme variação de índice oficial ou novo acordo entre as partes.
+        <strong>CLÁUSULA 3ª:</strong> O CONTRATANTE compromete-se a entregar documentos e informações dentro dos prazos legais, bem como comunicar qualquer alteração de faturamento, atividade ou endereço.
       </p>
-
-      <div class="ficha-section-title">Cláusula 5ª — Do prazo e da rescisão</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        O presente contrato vigora por prazo indeterminado, a partir da data de sua assinatura, podendo ser rescindido por qualquer das partes mediante aviso prévio por escrito com antecedência mínima de 30 (trinta) dias, ficando ressalvado o pagamento dos serviços já prestados até a data da rescisão.
+        <strong>CLÁUSULA 4ª:</strong> O CONTRATADO executará os serviços com observância às normas técnicas, éticas e legais da profissão contábil, responsabilizando-se tecnicamente pelos atos praticados no exercício de suas atribuições.<br>
+        <em>Parágrafo único:</em> O CONTRATADO não será responsável por multas, penalidades ou prejuízos decorrentes de omissão, atraso ou informações incorretas fornecidas pelo CONTRATANTE.
       </p>
 
-      <div class="ficha-section-title">Cláusula 6ª — Do sigilo e da proteção de dados</div>
+      <div class="ficha-section-title">DOS VALORES E CONDIÇÕES DE PAGAMENTO</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        A CONTRATADA compromete-se a tratar as informações e os dados pessoais a que tiver acesso em decorrência deste contrato com confidencialidade, utilizando-os exclusivamente para a execução dos serviços aqui previstos, em conformidade com a legislação de proteção de dados aplicável.
+        <strong>CLÁUSULA 5ª:</strong> Pelos serviços inclusos neste contrato, o CONTRATANTE pagará ao CONTRATADO o valor mensal de <strong style="color:var(--ink);">${honorarioTxt}</strong>, com vencimento todo dia 10 (dez) de cada mês, referente aos serviços prestados no mês anterior. Forma de pagamento: Pix, transferência bancária ou outro meio acordado entre as partes.
       </p>
-
-      <div class="ficha-section-title">Cláusula 7ª — Do foro</div>
       <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
-        Fica eleito o foro da comarca de ${escapeHtml(cidadeForo)} para dirimir quaisquer dúvidas ou controvérsias oriundas deste contrato, renunciando as partes a qualquer outro, por mais privilegiado que seja.
+        <strong>CLÁUSULA 6ª:</strong> Os serviços à parte terão valores e prazos ajustados previamente entre as partes.
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 7ª:</strong> O valor dos honorários será reajustado anualmente com base na variação do IGPM ou outro índice oficial que venha a substituí-lo, mediante aviso prévio de 30 (trinta) dias.
       </p>
 
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:18px;">
-        E por estarem assim justas e contratadas, as partes firmam o presente instrumento em duas vias de igual teor.
+      <div class="ficha-section-title">DA INADIMPLÊNCIA</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 8ª:</strong> O não pagamento no prazo acordado acarretará: multa de 2% sobre o valor devido; juros de mora de 1% ao mês; correção monetária pelo IGPM ou índice legal aplicável.<br>
+        <em>Parágrafo único:</em> O atraso superior a 30 (trinta) dias poderá ensejar a suspensão dos serviços até a regularização do débito.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">${escapeHtml(cidadeForo)}, ${dataExtenso}.</p>
+
+      <div class="ficha-section-title">DAS DESPESAS</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 9ª:</strong> Taxas governamentais, impostos, multas, emolumentos e demais despesas decorrentes de atos perante órgãos públicos são de responsabilidade exclusiva do CONTRATANTE.
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 10ª:</strong> Não se aplica o disposto na cláusula anterior quando a despesa decorrer de erro técnico comprovado do CONTRATADO.
+      </p>
+
+      <div class="ficha-section-title">DA PROTEÇÃO DE DADOS</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 11ª:</strong> As partes comprometem-se a cumprir a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados – LGPD), mantendo sigilo sobre dados e informações compartilhadas, utilizando-os exclusivamente para cumprimento das obrigações contratuais e legais.
+      </p>
+
+      <div class="ficha-section-title">DO PRAZO</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 12ª:</strong> O presente contrato terá prazo determinado de 12 (doze) meses, iniciando-se em ${dataExtenso} e encerrando-se em ${dataFimExtenso}, podendo ser prorrogado automaticamente por iguais e sucessivos períodos de 12 (doze) meses, caso não haja manifestação contrária de qualquer das partes, mediante aviso prévio por escrito de 30 (trinta) dias antes do término da vigência.
+      </p>
+
+      <div class="ficha-section-title">DA RESCISÃO</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 13ª:</strong> O contrato poderá ser rescindido por qualquer das partes mediante aviso prévio por escrito de 30 (trinta) dias, respeitando-se o prazo mínimo de vigência contratual estabelecido na cláusula anterior.
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 14ª:</strong> A rescisão não afasta a obrigação de pagamento dos honorários devidos até a data do encerramento, nem a responsabilidade técnica referente ao período contratado.
+      </p>
+
+      <div class="ficha-section-title">DA NATUREZA JURÍDICA</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 15ª:</strong> O presente contrato não gera vínculo empregatício entre as partes, sendo o CONTRATADO profissional autônomo.
+      </p>
+
+      <div class="ficha-section-title">DO FORO</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+        <strong>CLÁUSULA 16ª:</strong> Fica eleito o Foro da Comarca de ${escapeHtml(cidadeContratante)} para dirimir quaisquer controvérsias oriundas deste contrato.
+      </p>
+
+      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:16px;">
+        E por estarem assim justos e contratados, assinam o presente em 2 (duas) vias de igual teor.
+      </p>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:8px;">${escapeHtml(cidadeContratado)}, ${dataExtenso}.</p>
 
       <div style="display:flex;justify-content:space-between;gap:30px;margin-top:60px;">
-        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">CONTRATADA<br>${escapeHtml(s.escritorioNome||'')}</div>
-        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">CONTRATANTE<br>${escapeHtml(c.nome)}</div>
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">${contratanteNomeExibido}<br>CONTRATANTE</div>
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">${escapeHtml(p.responsavel||'')}<br>CONTRATADO</div>
       </div>
     </div>
   `;
@@ -4566,11 +4754,6 @@ function renderSistemaSettings(){
   document.getElementById('f-settings-pixkey').value = (DATA.settings && DATA.settings.pixKey) || '';
   document.getElementById('f-settings-pixnome').value = (DATA.settings && DATA.settings.pixTitular) || '';
   document.getElementById('f-settings-drivefolder').value = (DATA.settings && DATA.settings.driveFolder) || '';
-  document.getElementById('f-settings-escr-nome').value = (DATA.settings && DATA.settings.escritorioNome) || '';
-  document.getElementById('f-settings-escr-cnpj').value = (DATA.settings && DATA.settings.escritorioCnpj) || '';
-  document.getElementById('f-settings-escr-endereco').value = (DATA.settings && DATA.settings.escritorioEndereco) || '';
-  document.getElementById('f-settings-escr-responsavel').value = (DATA.settings && DATA.settings.escritorioResponsavel) || '';
-  document.getElementById('f-settings-escr-crc').value = (DATA.settings && DATA.settings.escritorioCrc) || '';
   const label = document.getElementById('storage-backend-label');
   if(label) label.textContent = storageBackendName();
   renderAvisoBackup();
@@ -4579,17 +4762,6 @@ function renderSistemaSettings(){
     renderLogAtividades();
   }
 }
-document.getElementById('btn-salvar-escritorio').addEventListener('click', async ()=>{
-  DATA.settings = Object.assign({}, DATA.settings, {
-    escritorioNome: document.getElementById('f-settings-escr-nome').value.trim(),
-    escritorioCnpj: document.getElementById('f-settings-escr-cnpj').value.trim(),
-    escritorioEndereco: document.getElementById('f-settings-escr-endereco').value.trim(),
-    escritorioResponsavel: document.getElementById('f-settings-escr-responsavel').value.trim(),
-    escritorioCrc: document.getElementById('f-settings-escr-crc').value.trim(),
-  });
-  const ok = await saveData();
-  if(ok){ showToast('Dados do escritório salvos.'); registrarLogAtividade('Dados do escritório alterados', ''); }
-});
 
 /* ---- Equipe e permissões (somente administradores) ---- */
 async function renderEquipePermissoes(){
