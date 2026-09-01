@@ -761,18 +761,23 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .confirm-modal{max-width:380px;text-align:left;}
 .confirm-modal p{color:var(--muted);font-size:13.5px;}
 
-/* ---------- ficha / print ---------- */
-.ficha-sheet{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:34px 38px;max-width:720px;}
+/* ---------- ficha / print (formatação ABNT: fonte, margens, espaçamento) ---------- */
+.ficha-sheet{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:3cm 2cm 2cm 3cm;max-width:760px;
+  font-family:'Times New Roman', Times, serif;font-size:12pt;line-height:1.5;color:var(--ink);
+}
+.ficha-sheet p{text-align:justify;text-indent:1.25cm;margin:0 0 10px;}
 .ficha-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px double var(--line-strong);padding-bottom:16px;margin-bottom:20px;}
-.ficha-brand{font-family:var(--font-display);font-weight:900;font-size:22px;color:var(--primary);}
-.ficha-date{font-size:11.5px;color:var(--muted);font-family:var(--font-mono);}
-.ficha-client-name{font-family:var(--font-display);font-size:24px;font-weight:600;margin:0 0 10px;}
-.ficha-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;font-size:13px;margin-bottom:22px;}
-.ficha-grid div span{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:2px;}
-.ficha-section-title{font-family:var(--font-display);font-size:15px;font-weight:600;margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
-.ficha-sheet table{margin-bottom:4px;}
-.ficha-sheet thead th{background:none;padding:6px 4px;font-size:10.5px;}
-.ficha-sheet tbody td{padding:7px 4px;font-size:12.5px;}
+.ficha-brand{font-family:'Times New Roman', Times, serif;font-weight:700;font-size:16pt;color:var(--primary);}
+.ficha-date{font-size:10.5pt;color:var(--muted);font-family:'Times New Roman', Times, serif;}
+.ficha-client-name{font-family:'Times New Roman', Times, serif;font-size:14pt;font-weight:700;margin:0 0 10px;text-indent:0;}
+.ficha-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;font-size:12pt;margin-bottom:22px;}
+.ficha-grid div span{display:block;font-size:9.5pt;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:2px;text-indent:0;}
+.ficha-section-title{font-family:'Times New Roman', Times, serif;font-size:12pt;font-weight:700;margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line);text-indent:0;text-align:left;}
+.ficha-sheet table{margin-bottom:4px;font-size:12pt;}
+.ficha-sheet thead th{background:none;padding:6px 4px;font-size:10.5pt;font-family:'Times New Roman', Times, serif;}
+.ficha-sheet tbody td{padding:7px 4px;font-size:12pt;font-family:'Times New Roman', Times, serif;}
 
 /* ---------- toast ---------- */
 .toast{
@@ -798,7 +803,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 /* ---------- print ---------- */
 @page{
   size: A4;
-  margin: 18mm 16mm;
+  margin: 3cm 2cm 2cm 3cm; /* topo direita baixo esquerda */
 }
 @media print{
   body *{visibility:hidden;}
@@ -1570,7 +1575,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 
         <div class="card" style="padding:22px 24px;">
           <div class="card-label" style="margin-bottom:8px;">Continuidade dos dados</div>
-          <div style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+          <div style="color:var(--muted);">
             No plano gratuito do Supabase, o projeto entra em "pausa" automática após 7 dias sem nenhum acesso — isso <strong style="color:var(--ink);">não apaga os dados</strong>, apenas hiberna o banco até alguém clicar em "Restore" no painel do Supabase. Usar o sistema durante a semana normalmente já evita isso.
             Mesmo assim, faça cópias de segurança regulares (ao lado) como proteção extra — o plano gratuito não guarda backups automáticos.
           </div>
@@ -4295,7 +4300,7 @@ function abrirFicha(clientId){
         <div><span>Data de admissão</span>${fmtDate(c.dataAdmissao)}</div>
         <div><span>Honorário mensal</span>${c.honorario ? fmtMoney(c.honorario) : '—'}</div>
       </div>
-      ${c.obs ? `<div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;"><strong>Observações:</strong> ${escapeHtml(c.obs)}</div>` : ''}
+      ${c.obs ? `<div style="color:var(--muted);margin-bottom:10px;"><strong>Observações:</strong> ${escapeHtml(c.obs)}</div>` : ''}
       ${(c.codigoAcesso || c.senhaGov) ? `
       <div class="ficha-section-title">Acesso aos portais</div>
       <div class="ficha-grid" style="margin-bottom:6px;">
@@ -4340,10 +4345,10 @@ function imprimirAutorizacaoServico(id){
       </div>
 
       <div class="ficha-section-title">Serviços a serem realizados</div>
-      <ul style="margin:0 0 22px;padding-left:20px;font-size:13px;line-height:1.9;">${itensHtml}</ul>
+      <ul style="margin:0 0 22px;padding-left:20px;">${itensHtml}</ul>
 
       <div class="ficha-section-title">Termo de autorização</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;">
+      <p style="color:var(--muted);">
         Eu, <strong style="color:var(--ink);">${escapeHtml(c ? c.nome : '_________________________')}</strong>,
         autorizo o escritório de contabilidade a executar os serviços descritos acima, nas condições, valor e prazo aqui informados.
       </p>
@@ -4397,100 +4402,100 @@ function abrirContrato(clientId){
       </div>
       <h2 class="ficha-client-name">Contrato de Prestação de Serviços Contábeis</h2>
 
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.8;margin-top:14px;">
+      <p style="color:var(--ink);margin-top:14px;">
         <strong>CONTRATANTE:</strong> <strong>${contratanteNomeExibido}</strong> – ${contratanteDoc}, instalada
         na ${escapeHtml(c.logradouro||'_________')}, nº ${escapeHtml(c.numero||'___')}, bairro ${escapeHtml(c.bairro||'_________')},
         ${escapeHtml(cidadeContratante)}${contratanteRepresentante}.
       </p>
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.8;">
+      <p style="color:var(--ink);">
         <strong>CONTRATADO:</strong> <strong>${escapeHtml(p.responsavel || '_________________________________')}</strong>,
         ${prestDocLinha}, residente na ${escapeHtml(p.logradouro||'_________')}, nº ${escapeHtml(p.numero||'___')},
         bairro ${escapeHtml(p.bairro||'_________')}, ${escapeHtml(cidadeContratado)}.
       </p>
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
+      <p style="color:var(--ink);">
         As partes acordam o presente contrato de prestação de serviços, que se regerá pelas cláusulas e condições abaixo:
       </p>
 
       <div class="ficha-section-title">DO OBJETO DO CONTRATO</div>
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;">
+      <p style="color:var(--ink);">
         <strong>CLÁUSULA 1ª:</strong> Constitui objeto do presente contrato a prestação de serviços contábeis digitais ao CONTRATANTE, enquadrado como ${enquadramento}, compreendendo as atividades abaixo descritas como serviços inclusos no honorário mensal e serviços à parte, conforme segue:
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong style="color:var(--ink);">Serviços inclusos no honorário mensal:</strong> apuração e envio mensal das guias de tributos devidos; acompanhamento das obrigações acessórias aplicáveis; elaboração e transmissão das declarações obrigatórias do regime; orientações gerais sobre obrigações fiscais, limites de faturamento e atividades permitidas; orientação para emissão de notas fiscais, mediante envio prévio das informações necessárias pelo CONTRATANTE; suporte para esclarecimento de dúvidas via canais digitais, em horário comercial.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong style="color:var(--ink);">Serviços à parte (cobrança adicional):</strong> alterações cadastrais (endereço, atividades, nome fantasia); desenquadramento de regime; parcelamentos de débitos; regularizações fiscais; emissão de certidões específicas; atendimento a fiscalizações; obrigações acessórias não previstas como obrigatórias; demais serviços não incluídos no honorário mensal. Os serviços à parte serão previamente orçados e aprovados pelo CONTRATANTE.
       </p>
 
       <div class="ficha-section-title">DAS OBRIGAÇÕES</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 2ª:</strong> O CONTRATANTE deverá fornecer ao CONTRATADO todas as informações, documentos e dados necessários à execução dos serviços, responsabilizando-se integralmente pela veracidade das informações prestadas.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 3ª:</strong> O CONTRATANTE compromete-se a entregar documentos e informações dentro dos prazos legais, bem como comunicar qualquer alteração de faturamento, atividade ou endereço.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 4ª:</strong> O CONTRATADO executará os serviços com observância às normas técnicas, éticas e legais da profissão contábil, responsabilizando-se tecnicamente pelos atos praticados no exercício de suas atribuições.<br>
         <em>Parágrafo único:</em> O CONTRATADO não será responsável por multas, penalidades ou prejuízos decorrentes de omissão, atraso ou informações incorretas fornecidas pelo CONTRATANTE.
       </p>
 
       <div class="ficha-section-title">DOS VALORES E CONDIÇÕES DE PAGAMENTO</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 5ª:</strong> Pelos serviços inclusos neste contrato, o CONTRATANTE pagará ao CONTRATADO o valor mensal de <strong style="color:var(--ink);">${honorarioTxt}</strong>, com vencimento todo dia 10 (dez) de cada mês, referente aos serviços prestados no mês anterior. Forma de pagamento: Pix, transferência bancária ou outro meio acordado entre as partes.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 6ª:</strong> Os serviços à parte terão valores e prazos ajustados previamente entre as partes.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 7ª:</strong> O valor dos honorários será reajustado anualmente com base na variação do IGPM ou outro índice oficial que venha a substituí-lo, mediante aviso prévio de 30 (trinta) dias.
       </p>
 
       <div class="ficha-section-title">DA INADIMPLÊNCIA</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 8ª:</strong> O não pagamento no prazo acordado acarretará: multa de 2% sobre o valor devido; juros de mora de 1% ao mês; correção monetária pelo IGPM ou índice legal aplicável.<br>
         <em>Parágrafo único:</em> O atraso superior a 30 (trinta) dias poderá ensejar a suspensão dos serviços até a regularização do débito.
       </p>
 
       <div class="ficha-section-title">DAS DESPESAS</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 9ª:</strong> Taxas governamentais, impostos, multas, emolumentos e demais despesas decorrentes de atos perante órgãos públicos são de responsabilidade exclusiva do CONTRATANTE.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 10ª:</strong> Não se aplica o disposto na cláusula anterior quando a despesa decorrer de erro técnico comprovado do CONTRATADO.
       </p>
 
       <div class="ficha-section-title">DA PROTEÇÃO DE DADOS</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 11ª:</strong> As partes comprometem-se a cumprir a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados – LGPD), mantendo sigilo sobre dados e informações compartilhadas, utilizando-os exclusivamente para cumprimento das obrigações contratuais e legais.
       </p>
 
       <div class="ficha-section-title">DO PRAZO</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 12ª:</strong> O presente contrato terá prazo determinado de 12 (doze) meses, iniciando-se em ${dataExtenso} e encerrando-se em ${dataFimExtenso}, podendo ser prorrogado automaticamente por iguais e sucessivos períodos de 12 (doze) meses, caso não haja manifestação contrária de qualquer das partes, mediante aviso prévio por escrito de 30 (trinta) dias antes do término da vigência.
       </p>
 
       <div class="ficha-section-title">DA RESCISÃO</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 13ª:</strong> O contrato poderá ser rescindido por qualquer das partes mediante aviso prévio por escrito de 30 (trinta) dias, respeitando-se o prazo mínimo de vigência contratual estabelecido na cláusula anterior.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 14ª:</strong> A rescisão não afasta a obrigação de pagamento dos honorários devidos até a data do encerramento, nem a responsabilidade técnica referente ao período contratado.
       </p>
 
       <div class="ficha-section-title">DA NATUREZA JURÍDICA</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 15ª:</strong> O presente contrato não gera vínculo empregatício entre as partes, sendo o CONTRATADO profissional autônomo.
       </p>
 
       <div class="ficha-section-title">DO FORO</div>
-      <p style="font-size:12.5px;color:var(--muted);line-height:1.7;">
+      <p style="color:var(--muted);">
         <strong>CLÁUSULA 16ª:</strong> Fica eleito o Foro da Comarca de ${escapeHtml(cidadeContratante)} para dirimir quaisquer controvérsias oriundas deste contrato.
       </p>
 
-      <p style="font-size:12.5px;color:var(--ink);line-height:1.7;margin-top:16px;">
+      <p style="color:var(--ink);margin-top:16px;">
         E por estarem assim justos e contratados, assinam o presente em 2 (duas) vias de igual teor.
       </p>
-      <p style="font-size:12.5px;color:var(--muted);margin-top:8px;">${escapeHtml(cidadeContratado)}, ${dataExtenso}.</p>
+      <p style="color:var(--muted);text-indent:0;">${escapeHtml(cidadeContratado)}, ${dataExtenso}.</p>
 
       <div style="display:flex;justify-content:space-between;gap:30px;margin-top:60px;">
         <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">${contratanteNomeExibido}<br>CONTRATANTE</div>
