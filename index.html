@@ -1031,6 +1031,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
     <div class="sidebar-foot">
       <button class="theme-toggle" id="btn-theme-toggle" type="button" style="margin-bottom:10px;">🌙 Modo escuro</button>
       <div id="sidebar-user-info" style="margin-bottom:6px;"></div>
+      <div id="sessao-countdown" style="display:none;margin-bottom:6px;font-family:var(--font-mono);"></div>
       <div>Dados salvos automaticamente e compartilhados com a equipe.</div>
     </div>
   </aside>
@@ -1523,13 +1524,16 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <h2 style="font-family:var(--font-display);font-size:18px;font-weight:600;margin:0;">A Receber</h2>
         <div class="view-desc" style="margin-top:2px;">Cobranças geradas automaticamente a partir dos serviços cadastrados</div>
       </div>
+      <div class="tabs-pill" style="margin-bottom:14px;">
+        <button class="tab-pill-btn active" id="aba-cobrancas-abertas" onclick="mudarAbaCobrancas('abertas')">Em aberto</button>
+        <button class="tab-pill-btn" id="aba-cobrancas-historico" onclick="mudarAbaCobrancas('historico')">Histórico (quitados)</button>
+      </div>
       <div class="toolbar">
         <select class="filter" id="filtro-pagamento-cliente"><option value="">Todos os clientes</option></select>
         <select class="filter" id="filtro-cobranca-status">
           <option value="">Todos os status</option>
           <option value="Em aberto">Em aberto</option>
           <option value="Parcial">Parcial</option>
-          <option value="Quitado">Quitado</option>
         </select>
         <input type="month" class="filter" id="filtro-cobranca-de" title="Vencimento a partir de">
         <input type="month" class="filter" id="filtro-cobranca-ate" title="Vencimento até">
@@ -2038,6 +2042,23 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   </div>
 </div>
 
+<!-- OVERLAY: editar cobrança -->
+<div class="overlay" id="overlay-editar-cobranca">
+  <div class="modal">
+    <h3>Editar cobrança</h3>
+    <div class="modal-sub">Ajuste descrição, valor ou vencimento desta cobrança</div>
+    <div class="field"><label>Descrição</label><input type="text" id="f-editcobranca-descricao"></div>
+    <div class="field-row">
+      <div class="field"><label>Valor total (R$)</label><input type="text" id="f-editcobranca-valor" placeholder="R$ 0,00"></div>
+      <div class="field"><label>Vencimento</label><input type="date" id="f-editcobranca-vencimento"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close="overlay-editar-cobranca">Cancelar</button>
+      <button class="btn" id="salvar-editar-cobranca">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- OVERLAY: histórico de pagamentos de uma cobrança -->
 <div class="overlay" id="overlay-historico">
   <div class="modal">
@@ -2129,7 +2150,7 @@ function attachMoneyMask(el){
     el.value = digits ? formatCentsToBRL(digits) : '';
   });
 }
-['f-cliente-honorario','f-servico-valor','f-pagamento-valor','f-lanc-valor'].forEach(id=>attachMoneyMask(document.getElementById(id)));
+['f-cliente-honorario','f-servico-valor','f-pagamento-valor','f-lanc-valor','f-editcobranca-valor'].forEach(id=>attachMoneyMask(document.getElementById(id)));
 
 /* ---- máscara de CPF e CNPJ (formata enquanto digita) ---- */
 function maskCPF(digits){
@@ -2608,7 +2629,7 @@ function saveData(){
         showToast('Erro ao salvar os dados' + (e && e.message ? ': ' + e.message : '.'));
         resolve(false);
       }
-    }, 250);
+    }, 80);
   });
 }
 
@@ -4016,21 +4037,61 @@ function filtrarCobrancasPorPeriodo(charges){
   });
 }
 
+/* ================= RENDER: COBRANÇAS (A Receber / Histórico) ================= */
+let cobrancasAbaAtual = 'abertas';
+function mudarAbaCobrancas(aba){
+  cobrancasAbaAtual = aba;
+  document.getElementById('aba-cobrancas-abertas').classList.toggle('active', aba==='abertas');
+  document.getElementById('aba-cobrancas-historico').classList.toggle('active', aba==='historico');
+  const statusFiltro = document.getElementById('filtro-cobranca-status');
+  if(statusFiltro) statusFiltro.style.display = aba==='historico' ? 'none' : '';
+  renderCobrancas();
+}
+function chargeDataQuitacao(chargeId){
+  const pagamentos = DATA.payments.filter(p=>p.chargeId===chargeId).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+  return pagamentos.length ? pagamentos[0].data : null;
+}
 function renderCobrancas(){
   const filtroCliente = document.getElementById('filtro-pagamento-cliente').value;
   const filtroStatus = document.getElementById('filtro-cobranca-status').value;
   let charges = filtrarCobrancasPorPeriodo(DATA.charges);
   let list = charges.map(ch=>({ ch, pago: chargePago(ch.id), status: chargeStatus(ch) }));
-  list = list.filter(x=> (!filtroCliente || x.ch.clientId===filtroCliente) && (!filtroStatus || x.status===filtroStatus));
-  list.sort((a,b)=>(a.ch.vencimento||'').localeCompare(b.ch.vencimento||''));
+  list = list.filter(x=> cobrancasAbaAtual==='historico' ? x.status==='Quitado' : x.status!=='Quitado');
+  list = list.filter(x=> (!filtroCliente || x.ch.clientId===filtroCliente) && (cobrancasAbaAtual==='historico' || !filtroStatus || x.status===filtroStatus));
   const container = document.getElementById('cobrancas-container');
 
   if(DATA.charges.length===0){
     container.innerHTML = `<div class="empty"><div class="empty-icon">＋</div><p>Nenhuma cobrança gerada ainda.<br>Cadastre um serviço com valor para gerar uma cobrança automaticamente aqui.</p></div>`;
     return;
   }
-  if(list.length===0){ container.innerHTML = `<div class="empty"><p>Nenhuma cobrança encontrada para este filtro.</p></div>`; return; }
+  if(list.length===0){
+    container.innerHTML = `<div class="empty"><p>${cobrancasAbaAtual==='historico' ? 'Nenhuma cobrança quitada encontrada para este filtro.' : 'Nenhuma cobrança encontrada para este filtro.'}</p></div>`;
+    return;
+  }
 
+  if(cobrancasAbaAtual==='historico'){
+    list.sort((a,b)=>(chargeDataQuitacao(b.ch.id)||'').localeCompare(chargeDataQuitacao(a.ch.id)||''));
+    let rows = list.map(({ch,pago})=>`<tr>
+      <td><strong>${escapeHtml(clientName(ch.clientId))}</strong></td>
+      <td>${escapeHtml(ch.descricao||'—')}</td>
+      <td>${fmtDate(ch.vencimento)}</td>
+      <td class="num">${fmtMoney(ch.valorTotal)}</td>
+      <td>${fmtDate(chargeDataQuitacao(ch.id))}</td>
+      <td><span class="tag tag-concluido">Quitado</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" title="Editar cobrança" onclick="editarCobranca('${ch.id}')">✎</button>
+          <button class="icon-btn" title="Histórico de pagamentos" onclick="verHistoricoCobranca('${ch.id}')">🕘</button>
+        </div>
+      </td>
+    </tr>`).join('');
+    container.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Cliente</th><th>Descrição</th><th>Vencimento</th><th style="text-align:right;">Valor</th><th>Quitado em</th><th>Status</th><th></th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
+    return;
+  }
+
+  list.sort((a,b)=>(a.ch.vencimento||'').localeCompare(b.ch.vencimento||''));
   let rows = list.map(({ch,pago,status})=>{
     const saldo = Math.max(ch.valorTotal - pago, 0);
     return `<tr>
@@ -4043,8 +4104,9 @@ function renderCobrancas(){
       <td><span class="tag ${chargeStatusTagClass(status)}">${status}</span></td>
       <td>
         <div class="row-actions">
-          ${status!=='Quitado' ? `<button class="icon-btn" title="Lançar pagamento" onclick="abrirLancamento('${ch.id}')">💰</button>` : ''}
-          ${status!=='Quitado' ? `<button class="icon-btn" title="Enviar cobrança via WhatsApp" onclick="enviarCobrancaWhatsapp('${ch.id}')">💬</button>` : ''}
+          <button class="icon-btn" title="Editar cobrança" onclick="editarCobranca('${ch.id}')">✎</button>
+          <button class="icon-btn" title="Lançar pagamento" onclick="abrirLancamento('${ch.id}')">💰</button>
+          <button class="icon-btn" title="Enviar cobrança via WhatsApp" onclick="enviarCobrancaWhatsapp('${ch.id}')">💬</button>
           <button class="icon-btn" title="Histórico de pagamentos" onclick="verHistoricoCobranca('${ch.id}')">🕘</button>
         </div>
       </td>
@@ -4055,6 +4117,27 @@ function renderCobrancas(){
     <thead><tr><th>Cliente</th><th>Descrição</th><th>Vencimento</th><th style="text-align:right;">Valor</th><th style="text-align:right;">Pago</th><th style="text-align:right;">Saldo</th><th>Status</th><th></th></tr></thead>
     <tbody>${rows}</tbody></table></div>`;
 }
+function editarCobranca(chargeId){
+  const ch = DATA.charges.find(c=>c.id===chargeId);
+  if(!ch) return;
+  currentChargeId = chargeId;
+  document.getElementById('f-editcobranca-descricao').value = ch.descricao || '';
+  setMoneyInputFromNumber(document.getElementById('f-editcobranca-valor'), ch.valorTotal||0);
+  document.getElementById('f-editcobranca-vencimento').value = ch.vencimento || '';
+  openOverlay('overlay-editar-cobranca');
+}
+document.getElementById('salvar-editar-cobranca').addEventListener('click', ()=>{
+  const ch = DATA.charges.find(c=>c.id===currentChargeId);
+  if(!ch) return;
+  const novoValor = moneyInputToNumber(document.getElementById('f-editcobranca-valor'));
+  if(novoValor<=0){ showToast('Informe um valor válido.'); return; }
+  ch.descricao = document.getElementById('f-editcobranca-descricao').value.trim();
+  ch.valorTotal = novoValor;
+  ch.vencimento = document.getElementById('f-editcobranca-vencimento').value;
+  saveData(); closeOverlay('overlay-editar-cobranca'); renderAll();
+  showToast('Cobrança atualizada.');
+  registrarLogAtividade('Cobrança editada', ch.descricao);
+});
 
 /* --- lançar pagamento (parcial ou total) --- */
 function abrirLancamento(chargeId){
@@ -5329,10 +5412,11 @@ document.querySelectorAll('.field-pass-toggle').forEach(btn=>{
 });
 
 /* ================= DESCONEXÃO AUTOMÁTICA POR INATIVIDADE ================= */
-/* Depois de 15 minutos sem nenhuma interação (mouse, teclado, toque ou rolagem),
+/* Depois de 5 minutos sem nenhuma interação (mouse, teclado, toque ou rolagem),
    desconecta automaticamente e volta para a tela de login. Só se aplica quando
-   o login via Supabase está ativo — sem ele não existe sessão para encerrar. */
-const INATIVIDADE_LIMITE_MS = 15 * 60 * 1000;
+   o login via Supabase está ativo — sem ele não existe sessão para encerrar.
+   Um contador visível na barra lateral mostra o tempo restante. */
+const INATIVIDADE_LIMITE_MS = 5 * 60 * 1000;
 let sessaoAtiva = false;
 let ultimaAtividade = Date.now();
 function registrarAtividade(){ ultimaAtividade = Date.now(); }
@@ -5342,14 +5426,29 @@ function registrarAtividade(){ ultimaAtividade = Date.now(); }
 async function desconectarPorInatividade(){
   sessaoAtiva = false;
   if(supabaseClient){ try{ await supabaseClient.auth.signOut(); }catch(e){} }
-  mostrarTelaLogin('Sessão encerrada após 15 minutos de inatividade. Faça login novamente.');
+  mostrarTelaLogin('Sessão encerrada após 5 minutos de inatividade. Faça login novamente.');
+}
+function atualizarContadorSessao(){
+  const el = document.getElementById('sessao-countdown');
+  if(!el) return;
+  if(!sessaoAtiva || !useSupabase()){ el.style.display = 'none'; return; }
+  const restanteMs = Math.max(0, INATIVIDADE_LIMITE_MS - (Date.now() - ultimaAtividade));
+  const totalSeg = Math.ceil(restanteMs/1000);
+  const min = Math.floor(totalSeg/60);
+  const seg = String(totalSeg%60).padStart(2,'0');
+  const alerta = totalSeg <= 60;
+  el.style.display = 'block';
+  el.style.color = alerta ? 'var(--danger)' : 'var(--muted)';
+  el.style.fontWeight = alerta ? '700' : '400';
+  el.textContent = `⏳ Sessão expira em ${min}:${seg}`;
 }
 setInterval(()=>{
+  atualizarContadorSessao();
   if(!sessaoAtiva || !useSupabase()) return;
   if(Date.now() - ultimaAtividade > INATIVIDADE_LIMITE_MS){
     desconectarPorInatividade();
   }
-}, 30000);
+}, 1000);
 
 async function initApp(){
   if(!useSupabase()){
