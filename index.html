@@ -243,6 +243,7 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 }
 
 .main{flex:1;min-width:0;padding:36px 44px;max-width:1080px;}
+.main.main-wide{max-width:1296px;} /* Agenda: calendário ~20% mais largo */
 .view{display:none;}
 .view.active{display:block;}
 
@@ -537,7 +538,7 @@ input,select,textarea{font-family:inherit;font-size:14px;}
 /* ---------- agenda aprimorada / alta visibilidade ---------- */
 .agenda-layout{
   display:grid;
-  grid-template-columns:minmax(0,1.65fr) minmax(330px,.85fr);
+  grid-template-columns:minmax(0,2fr) minmax(330px,.85fr);
   gap:18px;
   align-items:start;
   margin-top:16px;
@@ -1031,7 +1032,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
     <div class="sidebar-foot">
       <button class="theme-toggle" id="btn-theme-toggle" type="button" style="margin-bottom:10px;">🌙 Modo escuro</button>
       <div id="sidebar-user-info" style="margin-bottom:6px;"></div>
-      <div id="sessao-countdown" style="display:none;margin-bottom:6px;font-family:var(--font-mono);"></div>
       <div>Dados salvos automaticamente e compartilhados com a equipe.</div>
     </div>
   </aside>
@@ -1057,7 +1057,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
         <div class="dashboard-heading">
           <div class="dashboard-kicker">GESTÃO CONTÁBIL · CONTABILIDADE MIRANDA</div>
           <h1>Dashboard</h1>
-          <p id="dash-date">Visão geral da operação e dos resultados.</p>
+          <p id="dash-date"><span id="dash-date-text">Visão geral da operação e dos resultados.</span><span id="sessao-countdown" style="display:none;margin-left:12px;font-family:var(--font-mono);font-size:12px;"></span></p>
         </div>
         <div class="dashboard-top-actions">
           <div class="dashboard-live">
@@ -2649,6 +2649,7 @@ function switchView(view){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
+  document.querySelector('.main').classList.toggle('main-wide', view==='agenda');
   if(view!=='ficha') renderAll();
   if(view==='sistema') renderSistemaSettings();
   if(view==='fechamento') renderFechamento();
@@ -2744,7 +2745,7 @@ setInterval(atualizarRelogioDashboard, 60000);
 
 function renderDashboard(){
   const agora = new Date();
-  document.getElementById('dash-date').textContent = agora.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  document.getElementById('dash-date-text').textContent = agora.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
   const hora = agora.getHours();
   const saudacao = hora < 12 ? 'Bom dia.' : hora < 18 ? 'Boa tarde.' : 'Boa noite.';
   document.getElementById('dash-greeting').textContent = saudacao;
