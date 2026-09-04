@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM Contabilidade Miranda</title>
+
+<!-- PWA: permite instalar como aplicativo no Android/iPhone e gerar o APK -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1F3D2B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Contab. Miranda">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -791,6 +801,27 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .ficha-sheet thead th{background:none;padding:6px 4px;font-size:10.5pt;font-family:'Times New Roman', Times, serif;}
 .ficha-sheet tbody td{padding:7px 4px;font-size:12pt;font-family:'Times New Roman', Times, serif;}
 
+/* ---------- contrato: papel de fundo com moldura e marca d'água ---------- */
+.ficha-sheet, .ficha-sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.contrato-sheet{position:relative;overflow:hidden;}
+.contrato-sheet::before{
+  content:'';position:absolute;inset:8mm;border:2px solid var(--primary);opacity:0.35;pointer-events:none;z-index:0;
+}
+.contrato-sheet::after{
+  content:'';position:absolute;inset:11mm;border:1px solid var(--accent);opacity:0.35;pointer-events:none;z-index:0;
+}
+.contrato-watermark{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);
+  font-family:'Times New Roman', Times, serif;font-weight:700;font-size:60pt;color:var(--primary);
+  opacity:0.06;white-space:nowrap;pointer-events:none;z-index:0;letter-spacing:4px;
+}
+.contrato-conteudo{position:relative;z-index:1;}
+.contrato-categoria{
+  text-align:center;text-indent:0;font-weight:700;font-size:12pt;text-transform:uppercase;
+  margin:20px 0 10px;letter-spacing:0.5px;
+}
+.ficha-sheet .contrato-clausula{text-indent:0;margin:0 0 11px;}
+
 /* ---------- toast ---------- */
 .toast{
   position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);
@@ -871,8 +902,8 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .cliente-tipo-pill.pj{background:var(--accent-wash);color:var(--accent);}
 .cliente-tipo-pill.aut{background:#F0E4F5;color:#6A287F;}
 .cliente-modal-modern .modal{
-  max-width:780px;border-radius:16px;padding:0;overflow:hidden;
-  max-height:88vh;display:flex;flex-direction:column;
+  max-width:1180px;border-radius:16px;padding:0;overflow:hidden;
+  max-height:92vh;display:flex;flex-direction:column;
 }
 .cliente-modal-head{
   flex:0 0 auto;display:flex;align-items:center;gap:14px;
@@ -886,9 +917,14 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 .cliente-modal-head h3{color:#fff!important;margin:0!important;font-size:22px!important;}
 .cliente-modal-head .modal-sub{color:rgba(255,255,255,.72);margin:4px 0 0;}
-.cliente-form-body{flex:1 1 auto;overflow-y:auto;padding:28px 36px 10px;}
+.cliente-form-body{flex:1 1 auto;overflow-y:auto;padding:24px 36px 10px;}
+.cliente-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start;}
+.cliente-form-col{display:flex;flex-direction:column;min-width:0;}
+@media (max-width:900px){
+  .cliente-form-grid{grid-template-columns:1fr;}
+}
 .cliente-form-section{
-  margin:0 0 22px;padding:20px 22px 19px;border:1px solid var(--line);border-radius:12px;background:#FCFCFA;
+  margin:0 0 16px;padding:16px 20px 15px;border:1px solid var(--line);border-radius:12px;background:#FCFCFA;
   transition:border-color .15s ease;
 }
 .cliente-form-section:focus-within{border-color:var(--line-strong);}
@@ -1685,6 +1721,8 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 
     <div class="cliente-form-body">
       <div class="campo-obrigatorio-nota"><span>*</span> campos obrigatórios</div>
+      <div class="cliente-form-grid">
+      <div class="cliente-form-col">
       <div class="cliente-form-section">
         <div class="cliente-form-section-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1744,6 +1782,35 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 
       <div class="cliente-form-section">
         <div class="cliente-form-section-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Atendimento e cobrança
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Tipo de cliente</label>
+            <select id="f-cliente-tipocliente">
+              <option value="Mensal">Mensal</option>
+              <option value="Avulso">Avulso</option>
+              <option value="Demanda">Por Demanda</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div class="field"><label>Status</label>
+            <select id="f-cliente-status"><option>Ativa</option><option>Em encerramento</option><option>Inativa</option></select>
+          </div>
+        </div>
+
+        <div class="field-row" id="grupo-honorario-mensal">
+          <div class="field"><label>Honorário mensal (R$)</label><input type="text" id="f-cliente-honorario" placeholder="R$ 0,00"></div>
+          <div class="field"><label>Data de admissão</label><input type="date" id="f-cliente-admissao">
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">A cobrança mensal começa a ser gerada a partir deste mês.</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="cliente-form-col">
+      <div class="cliente-form-section">
+        <div class="cliente-form-section-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           Endereço
         </div>
@@ -1782,33 +1849,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 
       <div class="cliente-form-section">
         <div class="cliente-form-section-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Atendimento e cobrança
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Tipo de cliente</label>
-            <select id="f-cliente-tipocliente">
-              <option value="Mensal">Mensal</option>
-              <option value="Avulso">Avulso</option>
-              <option value="Demanda">Demanda</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="field"><label>Status</label>
-            <select id="f-cliente-status"><option>Ativa</option><option>Em encerramento</option><option>Inativa</option></select>
-          </div>
-        </div>
-
-        <div class="field-row" id="grupo-honorario-mensal">
-          <div class="field"><label>Honorário mensal (R$)</label><input type="text" id="f-cliente-honorario" placeholder="R$ 0,00"></div>
-          <div class="field"><label>Data de admissão</label><input type="date" id="f-cliente-admissao">
-            <div style="font-size:11px;color:var(--muted);margin-top:4px;">A cobrança mensal começa a ser gerada a partir deste mês.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cliente-form-section">
-        <div class="cliente-form-section-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Acessos e observações
         </div>
@@ -1829,6 +1869,8 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           </div>
         </div>
         <div class="field"><label>Observações</label><textarea id="f-cliente-obs" placeholder="Informações adicionais sobre o cliente..."></textarea></div>
+      </div>
+      </div>
       </div>
     </div>
 
@@ -4615,111 +4657,76 @@ function abrirContrato(clientId){
   const cidadeContratado = (p.cidade && p.uf) ? `${p.cidade}/${p.uf}` : (p.cidade || '_________________');
 
   document.getElementById('print-area').innerHTML = `
-    <div class="ficha-sheet">
-      <div class="ficha-top" style="display:block;">
-        <div style="font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--primary);">${escapeHtml(p.nomeFantasia || 'Contrato de Prestação de Serviços Contábeis')}</div>
-        <div class="ficha-date">Emitido em ${new Date().toLocaleDateString('pt-BR')}</div>
+    <div class="ficha-sheet contrato-sheet">
+      <div class="contrato-watermark">${escapeHtml((p.nomeFantasia||'CONTABILIDADE').toUpperCase())}</div>
+      <div class="contrato-conteudo">
+      <div class="ficha-top" style="display:block;text-align:center;border-bottom:2px solid var(--primary);">
+        <div style="font-family:'Times New Roman', Times, serif;font-weight:700;font-size:15pt;color:var(--primary);">${escapeHtml(p.nomeFantasia || 'Contrato de Prestação de Serviços Contábeis')}</div>
+        ${p.cnpj || p.cpf ? `<div style="font-size:9.5pt;color:var(--muted);margin-top:2px;">${p.cnpj?('CNPJ '+escapeHtml(p.cnpj)):('CPF '+escapeHtml(p.cpf||''))}${p.crc?' · CRC '+escapeHtml(p.crc):''}</div>` : ''}
       </div>
-      <h2 class="ficha-client-name">Contrato de Prestação de Serviços Contábeis</h2>
+      <h2 class="ficha-client-name" style="text-align:center;margin-top:14px;">CONTRATO DE PRESTAÇÃO DE SERVIÇOS CONTÁBEIS</h2>
 
-      <p style="color:var(--ink);margin-top:14px;">
+      <p class="contrato-clausula" style="color:var(--ink);margin-top:14px;">
         <strong>CONTRATANTE:</strong> <strong>${contratanteNomeExibido}</strong> – ${contratanteDoc}, instalada
         na ${escapeHtml(c.logradouro||'_________')}, nº ${escapeHtml(c.numero||'___')}, bairro ${escapeHtml(c.bairro||'_________')},
         ${escapeHtml(cidadeContratante)}${contratanteRepresentante}.
       </p>
-      <p style="color:var(--ink);">
+      <p class="contrato-clausula" style="color:var(--ink);">
         <strong>CONTRATADO:</strong> <strong>${escapeHtml(p.responsavel || '_________________________________')}</strong>,
         ${prestDocLinha}, residente na ${escapeHtml(p.logradouro||'_________')}, nº ${escapeHtml(p.numero||'___')},
         bairro ${escapeHtml(p.bairro||'_________')}, ${escapeHtml(cidadeContratado)}.
       </p>
-      <p style="color:var(--ink);">
+      <p class="contrato-clausula" style="color:var(--ink);">
         As partes acordam o presente contrato de prestação de serviços, que se regerá pelas cláusulas e condições abaixo:
       </p>
 
-      <div class="ficha-section-title">DO OBJETO DO CONTRATO</div>
-      <p style="color:var(--ink);">
-        <strong>CLÁUSULA 1ª:</strong> Constitui objeto do presente contrato a prestação de serviços contábeis digitais ao CONTRATANTE, enquadrado como ${enquadramento}, compreendendo as atividades abaixo descritas como serviços inclusos no honorário mensal e serviços à parte, conforme segue:
-      </p>
-      <p style="color:var(--muted);">
-        <strong style="color:var(--ink);">Serviços inclusos no honorário mensal:</strong> apuração e envio mensal das guias de tributos devidos; acompanhamento das obrigações acessórias aplicáveis; elaboração e transmissão das declarações obrigatórias do regime; orientações gerais sobre obrigações fiscais, limites de faturamento e atividades permitidas; orientação para emissão de notas fiscais, mediante envio prévio das informações necessárias pelo CONTRATANTE; suporte para esclarecimento de dúvidas via canais digitais, em horário comercial.
-      </p>
-      <p style="color:var(--muted);">
-        <strong style="color:var(--ink);">Serviços à parte (cobrança adicional):</strong> alterações cadastrais (endereço, atividades, nome fantasia); desenquadramento de regime; parcelamentos de débitos; regularizações fiscais; emissão de certidões específicas; atendimento a fiscalizações; obrigações acessórias não previstas como obrigatórias; demais serviços não incluídos no honorário mensal. Os serviços à parte serão previamente orçados e aprovados pelo CONTRATANTE.
+      <div class="contrato-categoria">Do objeto do contrato</div>
+      <p class="contrato-clausula" style="color:var(--ink);">
+        <strong>Cláusula 1ª:</strong> Constitui objeto do presente contrato a prestação de serviços contábeis digitais ao CONTRATANTE, enquadrado como ${enquadramento}, compreendendo as atividades abaixo descritas como serviços inclusos no honorário mensal e serviços à parte, conforme segue: <strong>Serviços inclusos no honorário mensal:</strong> apuração e envio mensal das guias de tributos devidos; acompanhamento das obrigações acessórias aplicáveis; elaboração e transmissão das declarações obrigatórias do regime; orientações gerais sobre obrigações fiscais, limites de faturamento e atividades permitidas; orientação para emissão de notas fiscais, mediante envio prévio das informações necessárias pelo CONTRATANTE; suporte para esclarecimento de dúvidas via canais digitais, em horário comercial. <strong>Serviços à parte (cobrança adicional):</strong> alterações cadastrais (endereço, atividades, nome fantasia); desenquadramento de regime; parcelamentos de débitos; regularizações fiscais; emissão de certidões específicas; atendimento a fiscalizações; obrigações acessórias não previstas como obrigatórias; demais serviços não incluídos no honorário mensal. Os serviços à parte serão previamente orçados e aprovados pelo CONTRATANTE.
       </p>
 
-      <div class="ficha-section-title">DAS OBRIGAÇÕES</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 2ª:</strong> O CONTRATANTE deverá fornecer ao CONTRATADO todas as informações, documentos e dados necessários à execução dos serviços, responsabilizando-se integralmente pela veracidade das informações prestadas.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 3ª:</strong> O CONTRATANTE compromete-se a entregar documentos e informações dentro dos prazos legais, bem como comunicar qualquer alteração de faturamento, atividade ou endereço.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 4ª:</strong> O CONTRATADO executará os serviços com observância às normas técnicas, éticas e legais da profissão contábil, responsabilizando-se tecnicamente pelos atos praticados no exercício de suas atribuições.<br>
-        <em>Parágrafo único:</em> O CONTRATADO não será responsável por multas, penalidades ou prejuízos decorrentes de omissão, atraso ou informações incorretas fornecidas pelo CONTRATANTE.
-      </p>
+      <div class="contrato-categoria">Das obrigações</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 2ª:</strong> O CONTRATANTE deverá fornecer ao CONTRATADO todas as informações, documentos e dados necessários à execução dos serviços, responsabilizando-se integralmente pela veracidade das informações prestadas.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 3ª:</strong> O CONTRATANTE compromete-se a entregar documentos e informações dentro dos prazos legais, bem como comunicar qualquer alteração de faturamento, atividade ou endereço.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 4ª:</strong> O CONTRATADO executará os serviços com observância às normas técnicas, éticas e legais da profissão contábil, responsabilizando-se tecnicamente pelos atos praticados no exercício de suas atribuições. <em>Parágrafo único:</em> O CONTRATADO não será responsável por multas, penalidades ou prejuízos decorrentes de omissão, atraso ou informações incorretas fornecidas pelo CONTRATANTE.</p>
 
-      <div class="ficha-section-title">DOS VALORES E CONDIÇÕES DE PAGAMENTO</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 5ª:</strong> Pelos serviços inclusos neste contrato, o CONTRATANTE pagará ao CONTRATADO o valor mensal de <strong style="color:var(--ink);">${honorarioTxt}</strong>, com vencimento todo dia 10 (dez) de cada mês, referente aos serviços prestados no mês anterior. Forma de pagamento: Pix, transferência bancária ou outro meio acordado entre as partes.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 6ª:</strong> Os serviços à parte terão valores e prazos ajustados previamente entre as partes.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 7ª:</strong> O valor dos honorários será reajustado anualmente com base na variação do IGPM ou outro índice oficial que venha a substituí-lo, mediante aviso prévio de 30 (trinta) dias.
-      </p>
+      <div class="contrato-categoria">Dos valores e condições de pagamento</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 5ª:</strong> Pelos serviços inclusos neste contrato, o CONTRATANTE pagará ao CONTRATADO o valor mensal de <strong>${honorarioTxt}</strong>, com vencimento todo dia 10 (dez) de cada mês, referente aos serviços prestados no mês anterior. Forma de pagamento: Pix, transferência bancária ou outro meio acordado entre as partes.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 6ª:</strong> Os serviços à parte terão valores e prazos ajustados previamente entre as partes.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 7ª:</strong> O valor dos honorários será reajustado anualmente com base na variação do IGPM ou outro índice oficial que venha a substituí-lo, mediante aviso prévio de 30 (trinta) dias.</p>
 
-      <div class="ficha-section-title">DA INADIMPLÊNCIA</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 8ª:</strong> O não pagamento no prazo acordado acarretará: multa de 2% sobre o valor devido; juros de mora de 1% ao mês; correção monetária pelo IGPM ou índice legal aplicável.<br>
-        <em>Parágrafo único:</em> O atraso superior a 30 (trinta) dias poderá ensejar a suspensão dos serviços até a regularização do débito.
-      </p>
+      <div class="contrato-categoria">Da inadimplência</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 8ª:</strong> O não pagamento no prazo acordado acarretará: multa de 2% sobre o valor devido; juros de mora de 1% ao mês; correção monetária pelo IGPM ou índice legal aplicável. <em>Parágrafo único:</em> O atraso superior a 30 (trinta) dias poderá ensejar a suspensão dos serviços até a regularização do débito.</p>
 
-      <div class="ficha-section-title">DAS DESPESAS</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 9ª:</strong> Taxas governamentais, impostos, multas, emolumentos e demais despesas decorrentes de atos perante órgãos públicos são de responsabilidade exclusiva do CONTRATANTE.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 10ª:</strong> Não se aplica o disposto na cláusula anterior quando a despesa decorrer de erro técnico comprovado do CONTRATADO.
-      </p>
+      <div class="contrato-categoria">Das despesas</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 9ª:</strong> Taxas governamentais, impostos, multas, emolumentos e demais despesas decorrentes de atos perante órgãos públicos são de responsabilidade exclusiva do CONTRATANTE.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 10ª:</strong> Não se aplica o disposto na cláusula anterior quando a despesa decorrer de erro técnico comprovado do CONTRATADO.</p>
 
-      <div class="ficha-section-title">DA PROTEÇÃO DE DADOS</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 11ª:</strong> As partes comprometem-se a cumprir a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados – LGPD), mantendo sigilo sobre dados e informações compartilhadas, utilizando-os exclusivamente para cumprimento das obrigações contratuais e legais.
-      </p>
+      <div class="contrato-categoria">Da proteção de dados</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 11ª:</strong> As partes comprometem-se a cumprir a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados – LGPD), mantendo sigilo sobre dados e informações compartilhadas, utilizando-os exclusivamente para cumprimento das obrigações contratuais e legais.</p>
 
-      <div class="ficha-section-title">DO PRAZO</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 12ª:</strong> O presente contrato terá prazo determinado de 12 (doze) meses, iniciando-se em ${dataExtenso} e encerrando-se em ${dataFimExtenso}, podendo ser prorrogado automaticamente por iguais e sucessivos períodos de 12 (doze) meses, caso não haja manifestação contrária de qualquer das partes, mediante aviso prévio por escrito de 30 (trinta) dias antes do término da vigência.
-      </p>
+      <div class="contrato-categoria">Do prazo</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 12ª:</strong> O presente contrato terá prazo determinado de 12 (doze) meses, iniciando-se em ${dataExtenso} e encerrando-se em ${dataFimExtenso}, podendo ser prorrogado automaticamente por iguais e sucessivos períodos de 12 (doze) meses, caso não haja manifestação contrária de qualquer das partes, mediante aviso prévio por escrito de 30 (trinta) dias antes do término da vigência.</p>
 
-      <div class="ficha-section-title">DA RESCISÃO</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 13ª:</strong> O contrato poderá ser rescindido por qualquer das partes mediante aviso prévio por escrito de 30 (trinta) dias, respeitando-se o prazo mínimo de vigência contratual estabelecido na cláusula anterior.
-      </p>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 14ª:</strong> A rescisão não afasta a obrigação de pagamento dos honorários devidos até a data do encerramento, nem a responsabilidade técnica referente ao período contratado.
-      </p>
+      <div class="contrato-categoria">Da rescisão</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 13ª:</strong> O contrato poderá ser rescindido por qualquer das partes mediante aviso prévio por escrito de 30 (trinta) dias, respeitando-se o prazo mínimo de vigência contratual estabelecido na cláusula anterior.</p>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 14ª:</strong> A rescisão não afasta a obrigação de pagamento dos honorários devidos até a data do encerramento, nem a responsabilidade técnica referente ao período contratado.</p>
 
-      <div class="ficha-section-title">DA NATUREZA JURÍDICA</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 15ª:</strong> O presente contrato não gera vínculo empregatício entre as partes, sendo o CONTRATADO profissional autônomo.
-      </p>
+      <div class="contrato-categoria">Da natureza jurídica</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 15ª:</strong> O presente contrato não gera vínculo empregatício entre as partes, sendo o CONTRATADO profissional autônomo.</p>
 
-      <div class="ficha-section-title">DO FORO</div>
-      <p style="color:var(--muted);">
-        <strong>CLÁUSULA 16ª:</strong> Fica eleito o Foro da Comarca de ${escapeHtml(cidadeContratante)} para dirimir quaisquer controvérsias oriundas deste contrato.
-      </p>
+      <div class="contrato-categoria">Do foro</div>
+      <p class="contrato-clausula" style="color:var(--ink);"><strong>Cláusula 16ª:</strong> Fica eleito o Foro da Comarca de ${escapeHtml(cidadeContratante)} para dirimir quaisquer controvérsias oriundas deste contrato.</p>
 
-      <p style="color:var(--ink);margin-top:16px;">
+      <p class="contrato-clausula" style="color:var(--ink);margin-top:16px;">
         E por estarem assim justos e contratados, assinam o presente em 2 (duas) vias de igual teor.
       </p>
-      <p style="color:var(--muted);text-indent:0;">${escapeHtml(cidadeContratado)}, ${dataExtenso}.</p>
+      <p class="contrato-clausula" style="color:var(--muted);text-align:center;">${escapeHtml(cidadeContratado)}, ${dataExtenso}.</p>
 
-      <div style="display:flex;justify-content:space-between;gap:30px;margin-top:60px;">
-        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">${contratanteNomeExibido}<br>CONTRATANTE</div>
-        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:12px;">${escapeHtml(p.responsavel||'')}<br>CONTRATADO</div>
+      <div style="display:flex;justify-content:space-between;gap:30px;margin-top:56px;">
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${contratanteNomeExibido}<br>CONTRATANTE</div>
+        <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${escapeHtml(p.responsavel||'')}<br>CONTRATADO</div>
+      </div>
       </div>
     </div>
   `;
@@ -5063,9 +5070,14 @@ function baixarBackup(){
     const blob = new Blob([payload], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const stamp = new Date().toISOString().slice(0,10);
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2,'0');
+    const mes = String(agora.getMonth()+1).padStart(2,'0');
+    const hora = String(agora.getHours()).padStart(2,'0');
+    const min = String(agora.getMinutes()).padStart(2,'0');
+    const stamp = `${dia}-${mes}-${agora.getFullYear()}_${hora}h${min}`;
     a.href = url;
-    a.download = `backup-contabil-${stamp}.json`;
+    a.download = `copia-de-seguranca_${stamp}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -5471,6 +5483,15 @@ async function initApp(){
   }
 }
 initApp();
+
+/* Registra o service worker (PWA) — permite instalar o app no Android/iPhone
+   e abrir instantaneamente nas próximas vezes. Se falhar (ex.: aberto como
+   arquivo local, sem servidor), o sistema continua funcionando normalmente. */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>
