@@ -1583,6 +1583,9 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
           <button class="btn" id="btn-imprimir-ficha">Imprimir / Salvar PDF</button>
         </div>
       </div>
+      <div class="no-print" style="max-width:720px;margin:0 auto 14px;padding:10px 14px;background:var(--accent-wash);border-radius:8px;font-size:11.5px;color:var(--ink);line-height:1.5;">
+        💡 <strong>Para um resultado mais limpo, sem data e sem o endereço do site no topo/rodapé:</strong> na janela de impressão, clique em <strong>"Mais definições"</strong> e desmarque a opção <strong>"Cabeçalhos e rodapés"</strong>. Isso é uma configuração do navegador, não deste sistema — mas já cuidamos de tirar o nome do sistema dessa parte automaticamente.
+      </div>
       <div id="print-area"></div>
     </section>
 
@@ -4560,7 +4563,14 @@ function abrirFicha(clientId){
   switchView('ficha');
 }
 document.getElementById('btn-voltar-clientes').addEventListener('click', ()=>switchView(fichaReturnView||'clientes'));
-document.getElementById('btn-imprimir-ficha').addEventListener('click', ()=>window.print());
+document.getElementById('btn-imprimir-ficha').addEventListener('click', ()=>{
+  const tituloOriginal = document.title;
+  document.title = ' '; // evita que o navegador imprima "CRM Contabilidade Miranda" no cabeçalho automático
+  const restaurarTitulo = ()=>{ document.title = tituloOriginal; };
+  window.addEventListener('afterprint', restaurarTitulo, { once:true });
+  window.print();
+  setTimeout(restaurarTitulo, 2000); // segurança, caso o navegador não dispare "afterprint"
+});
 
 /* ================= AUTORIZAÇÃO DE SERVIÇO (PDF) ================= */
 function imprimirAutorizacaoServico(id){
