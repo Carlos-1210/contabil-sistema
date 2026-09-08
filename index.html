@@ -4,16 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRM Contabilidade Miranda</title>
-
-<!-- PWA: permite instalar como aplicativo no Android/iPhone e gerar o APK -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1F3D2B">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Contab. Miranda">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
@@ -801,21 +791,14 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .ficha-sheet thead th{background:none;padding:6px 4px;font-size:10.5pt;font-family:'Times New Roman', Times, serif;}
 .ficha-sheet tbody td{padding:7px 4px;font-size:12pt;font-family:'Times New Roman', Times, serif;}
 
-/* ---------- contrato: papel de fundo com moldura e marca d'água ---------- */
+/* ---------- contrato: papel de fundo com moldura (visual mais formal) ---------- */
 .ficha-sheet, .ficha-sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.contrato-sheet{position:relative;overflow:hidden;}
-.contrato-sheet::before{
-  content:'';position:absolute;inset:8mm;border:2px solid var(--primary);opacity:0.35;pointer-events:none;z-index:0;
+.contrato-sheet{border:2px solid var(--primary);outline:1px solid var(--accent);outline-offset:-6px;padding:6px;}
+.contrato-conteudo{padding:14px 6px 6px;}
+.contrato-rodape-oficial{
+  margin-top:26px;padding-top:10px;border-top:1px solid var(--line);
+  font-size:8.5pt;color:var(--muted);text-align:center;letter-spacing:0.3px;
 }
-.contrato-sheet::after{
-  content:'';position:absolute;inset:11mm;border:1px solid var(--accent);opacity:0.35;pointer-events:none;z-index:0;
-}
-.contrato-watermark{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);
-  font-family:'Times New Roman', Times, serif;font-weight:700;font-size:60pt;color:var(--primary);
-  opacity:0.06;white-space:nowrap;pointer-events:none;z-index:0;letter-spacing:4px;
-}
-.contrato-conteudo{position:relative;z-index:1;}
 .contrato-categoria{
   text-align:center;text-indent:0;font-weight:700;font-size:12pt;text-transform:uppercase;
   margin:20px 0 10px;letter-spacing:0.5px;
@@ -853,6 +836,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   #print-area, #print-area *{visibility:visible;}
   #print-area{position:absolute;top:0;left:0;width:100%;padding:0;margin:0;}
   .ficha-sheet{border:none;box-shadow:none;max-width:100%;padding:0;}
+  .contrato-sheet{border:2px solid var(--primary) !important;padding:6px !important;}
   .no-print{display:none !important;}
 }
 
@@ -901,7 +885,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 .cliente-tipo-pill.pj{background:var(--accent-wash);color:var(--accent);}
 .cliente-tipo-pill.aut{background:#F0E4F5;color:#6A287F;}
-.cliente-modal-modern .modal{
+.modal.cliente-modal-modern{
   max-width:1180px;border-radius:16px;padding:0;overflow:hidden;
   max-height:92vh;display:flex;flex-direction:column;
 }
@@ -1708,7 +1692,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 
 <!-- OVERLAY: cliente -->
 <div class="overlay" id="overlay-cliente">
-  <div class="modal modal-wide cliente-modal-modern">
+  <div class="modal cliente-modal-modern">
     <div class="cliente-modal-head">
       <div class="cliente-modal-head-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -4658,7 +4642,6 @@ function abrirContrato(clientId){
 
   document.getElementById('print-area').innerHTML = `
     <div class="ficha-sheet contrato-sheet">
-      <div class="contrato-watermark">${escapeHtml((p.nomeFantasia||'CONTABILIDADE').toUpperCase())}</div>
       <div class="contrato-conteudo">
       <div class="ficha-top" style="display:block;text-align:center;border-bottom:2px solid var(--primary);">
         <div style="font-family:'Times New Roman', Times, serif;font-weight:700;font-size:15pt;color:var(--primary);">${escapeHtml(p.nomeFantasia || 'Contrato de Prestação de Serviços Contábeis')}</div>
@@ -4727,6 +4710,7 @@ function abrirContrato(clientId){
         <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${contratanteNomeExibido}<br>CONTRATANTE</div>
         <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${escapeHtml(p.responsavel||'')}<br>CONTRATADO</div>
       </div>
+      <div class="contrato-rodape-oficial">Documento gerado eletronicamente${p.nomeFantasia?' por '+escapeHtml(p.nomeFantasia):''} em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}.</div>
       </div>
     </div>
   `;
@@ -5483,15 +5467,6 @@ async function initApp(){
   }
 }
 initApp();
-
-/* Registra o service worker (PWA) — permite instalar o app no Android/iPhone
-   e abrir instantaneamente nas próximas vezes. Se falhar (ex.: aberto como
-   arquivo local, sem servidor), o sistema continua funcionando normalmente. */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
-  });
-}
 </script>
 </body>
 </html>
