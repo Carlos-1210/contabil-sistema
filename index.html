@@ -795,10 +795,6 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 .ficha-sheet, .ficha-sheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .contrato-sheet{border:2px solid var(--primary);outline:1px solid var(--accent);outline-offset:-6px;padding:6px;}
 .contrato-conteudo{padding:14px 6px 6px;}
-.contrato-rodape-oficial{
-  margin-top:26px;padding-top:10px;border-top:1px solid var(--line);
-  font-size:8.5pt;color:var(--muted);text-align:center;letter-spacing:0.3px;
-}
 .contrato-categoria{
   text-align:center;text-indent:0;font-weight:700;font-size:12pt;text-transform:uppercase;
   margin:20px 0 10px;letter-spacing:0.5px;
@@ -827,10 +823,9 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 
 /* ---------- print ---------- */
-@page{
-  size: A4;
-  margin: 3cm 2cm 2cm 3cm; /* topo direita baixo esquerda */
-}
+/* O @page fica numa tag <style> separada (id="print-page-rule"), trocada
+   dinamicamente pelo JavaScript: margens ABNT para Ficha/Autorização, e
+   sem nenhuma margem para o Contrato (ver listener de btn-imprimir-ficha). */
 @media print{
   body *{visibility:hidden;}
   #print-area, #print-area *{visibility:visible;}
@@ -945,6 +940,7 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
 }
 
 </style>
+<style id="print-page-rule">@page{ size: A4; margin: 3cm 2cm 2cm 3cm; }</style>
 </head>
 <body>
 <script>
@@ -4566,6 +4562,14 @@ document.getElementById('btn-voltar-clientes').addEventListener('click', ()=>swi
 document.getElementById('btn-imprimir-ficha').addEventListener('click', ()=>{
   const tituloOriginal = document.title;
   document.title = ' '; // evita que o navegador imprima "CRM Contabilidade Miranda" no cabeçalho automático
+
+  // Contrato: sem nenhuma margem de página. Ficha/Autorização: mantém as margens ABNT (3cm/2cm).
+  const ehContrato = !!document.querySelector('#print-area .contrato-sheet');
+  const regraPagina = document.getElementById('print-page-rule');
+  regraPagina.textContent = ehContrato
+    ? '@page{ size: A4; margin: 0; }'
+    : '@page{ size: A4; margin: 3cm 2cm 2cm 3cm; }';
+
   const restaurarTitulo = ()=>{ document.title = tituloOriginal; };
   window.addEventListener('afterprint', restaurarTitulo, { once:true });
   window.print();
@@ -4720,7 +4724,6 @@ function abrirContrato(clientId){
         <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${contratanteNomeExibido}<br>CONTRATANTE</div>
         <div style="text-align:center;flex:1;border-top:1px solid var(--ink);padding-top:6px;font-size:11pt;">${escapeHtml(p.responsavel||'')}<br>CONTRATADO</div>
       </div>
-      <div class="contrato-rodape-oficial">Documento gerado eletronicamente${p.nomeFantasia?' por '+escapeHtml(p.nomeFantasia):''} em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}.</div>
       </div>
     </div>
   `;
