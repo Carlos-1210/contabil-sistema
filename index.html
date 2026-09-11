@@ -80,6 +80,10 @@
 .gs-icon{flex:0 0 auto;}
 .gs-sub{margin-left:auto;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;}
 .global-search-empty{padding:16px;color:var(--muted);font-size:12.5px;text-align:center;}
+.anexo-whatsapp-aviso{
+  margin:4px 0 16px;padding:12px 14px;background:var(--primary-wash);border-radius:var(--radius);
+  font-size:11.5px;color:var(--ink);line-height:1.6;
+}
 
 .fechamento-card{padding:14px 16px;margin-bottom:10px;}
 .fechamento-card-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:14px;}
@@ -2014,6 +2018,28 @@ select.filter, input.filter{padding:9px 10px;border:1px solid var(--line-strong)
   </div>
 </div>
 
+<!-- OVERLAY: anexar documento + mensagem para enviar juntos via WhatsApp -->
+<div class="overlay" id="overlay-anexo-whatsapp">
+  <div class="modal modal-wide">
+    <h3>Anexo + mensagem para o WhatsApp</h3>
+    <div class="modal-sub" id="anexo-whatsapp-cliente-info">—</div>
+    <div class="field">
+      <label>Documento a enviar</label>
+      <input type="file" id="f-anexo-whatsapp-arquivo">
+      <small id="anexo-whatsapp-arquivo-nome" style="display:block;margin-top:5px;color:var(--muted);"></small>
+    </div>
+    <div class="field"><label>Mensagem</label><textarea id="f-anexo-whatsapp-texto" style="min-height:130px;"></textarea></div>
+    <div class="anexo-whatsapp-aviso">
+      📱 <strong>No celular:</strong> ao clicar em "Compartilhar", o menu de compartilhamento do aparelho abre com o arquivo e a mensagem juntos — é só escolher o WhatsApp e o contato.<br>
+      💻 <strong>No computador:</strong> a maioria dos navegadores não permite anexar arquivo por essa via. Nesse caso, o sistema baixa o arquivo e abre o WhatsApp Web com a mensagem pronta — é só arrastar o arquivo baixado para dentro da conversa.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" data-close="overlay-anexo-whatsapp">Cancelar</button>
+      <button class="btn" id="btn-compartilhar-anexo-whatsapp">📤 Compartilhar</button>
+    </div>
+  </div>
+</div>
+
 <!-- OVERLAY: detalhe do dia na agenda -->
 <div class="overlay" id="overlay-agenda-dia">
   <div class="modal modal-wide">
@@ -3544,6 +3570,7 @@ function renderServicos(){
     <td><span class="tag ${tagClass[s.status]||'tag-pendente'}">${s.status}</span></td>
     <td>
       <div class="row-actions">
+        <button class="icon-btn" title="Enviar anexo + mensagem no WhatsApp" onclick="abrirAnexoWhatsapp('${s.id}')">📎</button>
         <button class="icon-btn" title="Autorização em PDF" onclick="imprimirAutorizacaoServico('${s.id}')">📝</button>
         <button class="icon-btn" title="Editar" onclick="editarServico('${s.id}')">✎</button>
         <button class="icon-btn danger btn-excluir-registro" title="Excluir" onclick="excluirServico('${s.id}')">🗑</button>
@@ -4292,6 +4319,68 @@ document.getElementById('enviar-whatsapp-cliente').addEventListener('click', ()=
     showToast(`Lembrete enviado. Restam ${lembreteQueue.length} — abrindo o próximo...`);
     setTimeout(processarProximoLembrete, 900);
   }
+});
+
+/* ================= ANEXO + MENSAGEM JUNTOS (Serviços) =================
+   O WhatsApp não permite anexar um arquivo automaticamente por link (isso
+   não existe em nenhum link tipo wa.me — é uma limitação do próprio
+   WhatsApp, não deste sistema). A única forma de enviar arquivo + texto
+   juntos num só passo é usando o compartilhamento nativo do aparelho
+   (Web Share API), que funciona bem em celular. No computador, como a
+   maioria dos navegadores não permite compartilhar arquivo dessa forma,
+   o sistema baixa o arquivo e abre o WhatsApp Web com a mensagem pronta,
+   para o usuário arrastar o arquivo para dentro da conversa manualmente. */
+let anexoWhatsappServicoId = null;
+function abrirAnexoWhatsapp(serviceId){
+  const s = DATA.services.find(x=>x.id===serviceId);
+  if(!s) return;
+  const c = DATA.clients.find(x=>x.id===s.clientId);
+  if(!c || !c.telefone){ showToast('Este cliente não tem telefone cadastrado.'); return; }
+  anexoWhatsappServicoId = serviceId;
+  document.getElementById('anexo-whatsapp-cliente-info').textContent = `Para: ${c.nome} · ${c.telefone}`;
+  document.getElementById('f-anexo-whatsapp-arquivo').value = '';
+  document.getElementById('anexo-whatsapp-arquivo-nome').textContent = '';
+  const itens = servicoItens(s);
+  document.getElementById('f-anexo-whatsapp-texto').value =
+    `Olá, ${c.nome}! 👋\n\nSegue em anexo o documento referente a: ${itens[0]||s.tipoServico||'seu serviço'}.\n\nQualquer dúvida, estamos à disposição!`;
+  openOverlay('overlay-anexo-whatsapp');
+}
+document.getElementById('f-anexo-whatsapp-arquivo').addEventListener('change', (e)=>{
+  const arquivo = e.target.files[0];
+  document.getElementById('anexo-whatsapp-arquivo-nome').textContent = arquivo ? `📄 ${arquivo.name}` : '';
+});
+document.getElementById('btn-compartilhar-anexo-whatsapp').addEventListener('click', async ()=>{
+  const s = DATA.services.find(x=>x.id===anexoWhatsappServicoId);
+  if(!s) return;
+  const c = DATA.clients.find(x=>x.id===s.clientId);
+  if(!c || !c.telefone){ showToast('Este cliente não tem telefone cadastrado.'); return; }
+  const texto = document.getElementById('f-anexo-whatsapp-texto').value.trim();
+  const arquivo = document.getElementById('f-anexo-whatsapp-arquivo').files[0];
+
+  if(arquivo && navigator.share && navigator.canShare && navigator.canShare({ files:[arquivo] })){
+    try{
+      await navigator.share({ files:[arquivo], text: texto, title: 'Documento' });
+      closeOverlay('overlay-anexo-whatsapp');
+      showToast('Escolha o WhatsApp e o contato na tela de compartilhamento.');
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return; // usuário cancelou o compartilhamento
+      // se falhar por outro motivo, cai no plano B abaixo
+    }
+  }
+
+  // Plano B (computador ou sem suporte a compartilhar arquivo): baixa o
+  // arquivo, se houver, e abre o WhatsApp Web só com o texto.
+  if(arquivo){
+    const url = URL.createObjectURL(arquivo);
+    const a = document.createElement('a');
+    a.href = url; a.download = arquivo.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  }
+  window.open(whatsappUrl(c.telefone, texto), '_blank');
+  closeOverlay('overlay-anexo-whatsapp');
+  showToast(arquivo ? 'Arquivo baixado e WhatsApp aberto — arraste o arquivo para dentro da conversa.' : 'WhatsApp aberto com a mensagem.');
 });
 
 /* Lembrete de vencimento — mensagem individual e envio em lote */
